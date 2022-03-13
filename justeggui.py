@@ -1,5 +1,5 @@
 # justeg.py
-# garphic interface that manages the encrypt and decrypt a message hidden inside the colour channels of a pbm image
+# A graphic interface that manages the encrypt and decrypt a message hidden inside the colour channels of a pbm image
 
 # Developed by Emanuel Evans
 # first released: 14/9/18
@@ -10,24 +10,29 @@ from tkinter.scrolledtext import *
 from tkinter import filedialog
 from tkinter import messagebox
 
+import config
 import encoder
 from imgcanvas import ImgCanvas
 
 
 class JustegGui:
     def __init__(self, root):
-        '''creates all the widgets of the gui except for the PhotoImage due to errors they have been decleared outside this function'''
+        """
+        creates all the widgets of the gui except for the PhotoImage due to errors they have been declared outside this function
+        """
         self.frames = []
         # add more items in this list to have more frames (pages) in your interface
         self.frames_name = ["menu", "encryption", "decryption"]
         self.page = IntVar()
-        # initialise the width of the photoimage, this needs to be different from zero even though img not grid yet
+        # initialise the width of the photoimage, this needs to be different from zero even though the image is not grid yet
         # self.width = 1
         self.page.set(0)
-
+        self.bg_col = config.colours["background"]
         # creates frames and widgets present across all pages
         for key in self.frames_name:
-            self.frames.append(LabelFrame(root, text=key, bg="#f4F7FF"))  # background colour
+            self.frames.append(LabelFrame(root, text=key, bg=self.bg_col,
+                                          font=("Calibri", "15", "italic")))
+
             self.error_label = Label(self.frames[self.frames_name.index(key)], text="error", anchor=CENTER,
                                      bg="#ffb800", fg="#fff", font=("Calibri", "11", "bold italic"))
 
@@ -45,25 +50,35 @@ class JustegGui:
         # menu frame_______________note: frames[self.frames_name.index("menu")] = frame[0]_______________#
 
         self.button_encry = Button(self.frames[self.frames_name.index("menu")], text="Encryption (Select File)",
-                                   command=lambda: self.select_file("encryption"), width=50, height=4, anchor=CENTER,
-                                   bg="#FF980A", fg="#fff", font=("Calibri", "18", "bold"))
+                                   command=lambda: self.select_file("encryption"),
+                                   width=50, height=4, anchor=CENTER,
+                                   bg=config.colours["encrypt_btn"], fg="#fff",
+                                   font=("Calibri", "18", "bold"))
         self.button_encry.grid(row=0, column=0, columnspan=3, padx=120, pady=30)
         self.button_decry = Button(self.frames[self.frames_name.index("menu")], text="Decryption (Select File)",
-                                   command=lambda: self.select_file("decryption"), width=50, height=4, anchor=CENTER,
-                                   bg="#812BB2", fg="#fff", font=("Calibri", "18", "bold"))
+                                   command=lambda: self.select_file("decryption"),
+                                   width=50, height=4, anchor=CENTER,
+                                   bg=config.colours["decrypt_btn"], fg="#fff",
+                                   font=("Calibri", "18", "bold"))
         self.button_decry.grid(row=1, column=0, columnspan=3, sticky=N + S, padx=120, pady=30)
 
         # encryption frame_______________Enter and Encrypt Message_______________#
         # labels
-        self._num_label = Label(self.frames[self.frames_name.index("encryption")], text="Enter Message:", bg="#f4F7FF")
-        self._img_original = Label(self.frames[self.frames_name.index("encryption")], text="Original Image:",
-                                   bg="#f4F7FF")
-        self._img_en = Label(self.frames[self.frames_name.index("encryption")], text="Encrypted Image:", bg="#f4F7FF")
+        self._num_label = Label(self.frames[self.frames_name.index("encryption")],
+                                text="Enter Message:", bg=self.bg_col)
+
+        self._img_original = Label(self.frames[self.frames_name.index("encryption")],
+                                   text="Original Image:", bg=self.bg_col)
+
+        self._img_en = Label(self.frames[self.frames_name.index("encryption")],
+                             text="Encrypted Image:", bg=self.bg_col)
         # interaction widgets
-        self.inputbox = ScrolledText(self.frames[self.frames_name.index("encryption")], width=40, height=10,
-                                     state="normal", wrap='word')
+        self.inputbox = ScrolledText(self.frames[self.frames_name.index("encryption")],
+                                     width=40, height=10, state="normal", wrap='word')
+
         self.submit = Button(self.frames[self.frames_name.index("encryption")], width=30, anchor=CENTER,
-                             text="Save message in a new image", bg="#FF980A", fg="#fff",
+                             text="Save message in a new image",
+                             bg=config.colours["encrypt_btn"], fg="#fff",
                              font=("Calibri", "13", "bold"), command=self.show_encrypt)  # 80bfff
 
         self.result_label = Label(self.frames[self.frames_name.index("encryption")], anchor=CENTER, bg="#009",
@@ -76,8 +91,11 @@ class JustegGui:
 
         # decryption frame_______________Show image and message_______________#
         self.submit_decry = Button(self.frames[self.frames_name.index("decryption")], width=20, anchor=CENTER,
-                                   text="Get Message", bg="#812BB2", fg="#fff", font=("Calibri", "13", "bold"),
+                                   text="Get Message",
+                                   bg=config.colours["decrypt_btn"], fg="#fff",
+                                   font=("Calibri", "13", "bold"),
                                    command=self.show_decryption)
+
         self.message_label = ScrolledText(self.frames[self.frames_name.index("decryption")], width=50, height=10,
                                           state="disabled", wrap='word')
 
@@ -119,27 +137,24 @@ class JustegGui:
             self.page.set(key)
             self.frames[self.page.get()].pack(anchor=CENTER, expand=TRUE)
 
-
     def select_file(self, next_frame):
         """
         manage the interaction between the user and the image directory to select a pbm image
         """
-        filename = ''
-        while filename == '':
-            try:
-                filename = filedialog.askopenfilename(initialdir="\img", title="Select file",
-                                                      filetypes=(("pbm files", "*.pbm"),))
-                # note that file log have .pbm as required format therefore the user is not allowed to select anything else
-                # so no further error prevention is needed
+        try:
+            filename = filedialog.askopenfilename(initialdir="\img", title="Select file",
+                                                  filetypes=(("pbm files", "*.pbm"),))
+            # note that file log have .pbm as required format therefore the user is not allowed to select anything else
+            # so no further error prevention is needed
 
-            except IOError as e:
-                # In case file not found a popup message is already sent by the interface, this logs the error
-                print("Couldn't open the file {}".format(filename))
+            if (filename != ''):
+                self.img_canvas = ImgCanvas(filename)
+                self.display_img(self.img_canvas, next_frame)
+                self.change_page(self.frames_name.index(next_frame))
 
-        self.img_canvas = ImgCanvas(filename)
-        self.display_img(self.img_canvas, next_frame)
-        self.change_page(self.frames_name.index(next_frame))
-
+        except IOError as e:
+            # In case file not found a popup message is already sent by the interface, this logs the error
+            print("Couldn't open the file {}".format(filename))
 
     def display_img(self, image, next_frame):
 
@@ -154,7 +169,6 @@ class JustegGui:
         self.img_label = Label(self.frames[self.frames_name.index(next_frame)], image=self.img)
         self.img_label.grid(row=1, column=2, rowspan=2, sticky="N")
         self._img_original.grid(row=0, column=2)
-
 
     def show_encrypt(self):
         text_to_encrypt = self.inputbox.get('1.0', END)
@@ -186,13 +200,12 @@ class JustegGui:
 
         # Clear the entry box and confirm that message have been encrypted
         self.inputbox.delete("0.0", END)
-        self.result_label.configure(text="message encrypted successfully", bg="#FF980A")
+        self.result_label.configure(text="message encrypted successfully",
+                                    bg=config.colours["encrypt_btn"])
         # Prevent the button to be clicked again after the operation have been performed
         self.submit.configure(state='disabled')
 
-
         self.result_label.grid(row=1, column=0, columnspan=2, sticky=W + E, padx=120, pady=10)
-
 
     def show_decryption(self):
         text = encoder.decryption(self.img_canvas)
@@ -208,6 +221,6 @@ if __name__ == '__main__':
     root = Tk()
     root.geometry("1100x720+20+0")
     root.title("justeg")
-    root.configure(background="#f4F7FF")
+    root.configure(background=config.colours["background"])
     interface = JustegGui(root)
     root.mainloop()
