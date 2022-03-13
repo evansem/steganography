@@ -23,33 +23,38 @@ In the end, Justeg is just a funny way to hide messages inside images.
 It is important to note that at the current stage this program only allows encrypting ASCII characters.
 Furthermore, encryption and decryption operations can only be applied to images in a pbm format.
 
+![](doc/homepage.png)
+
 ## Encryption
 1. Start by clicking Encryption in the menu frame
 2. Then you will be prompted to select a .pbm file through your normal os file dialog.
    Default a folder with some sample images will be opened, feel free to use them or covert your own images (jpg/png) to pbm using GIMP or other editing software
 3. After that the encryption frame will be displayed. Containing a text-box where you can type your message to encrypt,
    and the preview of the image that you selected.
-![img.png](doc/encrypt_screenshot.png)
 4. When you are feeling confident with what you have written press the button 
    'save message in a new image' and Justeg will do the magic
 5. Now a file dialog will prompt you to choose where to save the image containing the hidden message
 6. Finally, a preview of both images will be displayed to show you that the difference is unnoticeable 
 
-![img.png](doc/encrypt_screenshot_success.png)
+Before                            |  After
+:--------------------------------:|:-------------------------:
+![](doc/encrypt_screenshot.png)   |  ![](doc/encrypt_screenshot_success.png)
 
 ## Decryption
 1. Start by clicking Decryption in the menu frame
 2. Then you will be prompted to select a file through your normal os file dialog.
 3. After that the selected image will be displayed on screen (note that this does not imply that a message is hidden in it)
-![img.png](doc/decrypt_screenshot.png)
-4. Finally, click 'get message' and the message will be shown in the box below
 
-![img.png](doc/decrypt_screenshot_success.png)
+4. Finally, click 'get message' and the message will be shown in the box below
 
 5. If needed you can use the bar on the right to scroll up and down to read the message.
 
 **Note:** Once the message is on the screen there is no timer, it will remain until you go back to the menu or you quit the program 
 Once you do so the message will still be inside the image
+
+Before                            |  After
+:--------------------------------:|:-------------------------:
+![](doc/decrypt_screenshot.png)   |  ![](doc/decrypt_screenshot_success.png)
 
 ## Erasing encrypted message
 to delete the message inside the image you can either delete the .pbm image or overwrite a new message
