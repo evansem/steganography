@@ -34,15 +34,10 @@ class JustegGui:
             self.button_back = Button(self.frames[self.frames_name.index(key)], text="Return Home",
                                       command=lambda: self.change_page(
                                           0))  # pass self.page-1 to go back instead of home page in case more frames are added
-            self.button_quit = Button(self.frames[self.frames_name.index(key)], text="Quit", command=self.ask_quit,
-                                      bg="#FF2621", fg="#fff")  # command=root.destroy to not have popup
 
             # home/back button position
             if key != "menu":
                 self.button_back.grid(row=3, column=0, sticky=N + W)
-                self.button_quit.grid(row=3, column=1, sticky=N + E)
-            else:
-                self.button_quit.grid(row=5, column=1)
 
         # use pack for frames so always at the center
         self.frames[0].pack(anchor=CENTER, expand=TRUE)
@@ -259,11 +254,6 @@ class JustegGui:
         self.message_label.insert(END, text)
         self.message_label.configure(state='disabled')
         self.submit_decry.configure(state='disabled')  # no possible to click button after decryption
-
-    def ask_quit(self):
-        '''popup when user click quit, red button'''
-        if messagebox.askokcancel("Quit", "Do you want to quit?"):
-            root.destroy()
 
 
 if __name__ == '__main__':
