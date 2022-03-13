@@ -2,17 +2,19 @@
 #garphic interface that manages the encrypt and decrypt a message hidden inside the colour channels of a pbm image
 
 #Developed by Emanuel Evans
-#released: 14/9/18 
+#first released: 14/9/18
+#reviewed on: 13/3/22
 
 from tkinter import *
 from tkinter.scrolledtext import * 
 from tkinter import filedialog
 from tkinter import messagebox
-import config
+
 import encoder
+from imgcanvas import ImgCanvas
 
 
-class Justeg:
+class JustegGui:
     def __init__(self, root):
         '''creates all the widgets of the gui except for the PhotoImage due to errors they have been decleared outside this function'''
         self.frames = []
@@ -20,10 +22,8 @@ class Justeg:
         self.frames_name = ["menu", "encryption", "decryption"]
         self.page = IntVar()
         #initialise the width of the photoimage, this needs to be different from zero even though img not grid yet
-        self.width = 1
+        # self.width = 1
         self.page.set(0)
-
-        self.skip = config.pbm["prefix"]
         
         #creates frames and widgets present across all pages
         for key in self.frames_name:
@@ -58,7 +58,7 @@ class Justeg:
         self._img_en = Label(self.frames[self.frames_name.index("encryption")], text="Encrypted Image:", bg="#f4F7FF") 
         #interaction widgets
         self.inputbox= ScrolledText(self.frames[self.frames_name.index("encryption")], width = 40, height = 10, state="normal", wrap = 'word')
-        self.submit= Button(self.frames[self.frames_name.index("encryption")], width=30, anchor=CENTER, text="Save message in a new image", bg="#FF980A", fg="#fff", font=("Calibri", "13", "bold"), command=self.encrypt) #80bfff
+        self.submit= Button(self.frames[self.frames_name.index("encryption")], width=30, anchor=CENTER, text="Save message in a new image", bg="#FF980A", fg="#fff", font=("Calibri", "13", "bold"), command=self.show_encrypt) #80bfff
         self.result_label = Label(self.frames[self.frames_name.index("encryption")], anchor=CENTER, bg="#009", fg="#fff", font=("Calibri", "11", "bold italic"))
 
         #layout
@@ -112,12 +112,13 @@ class Justeg:
 
     def select_file(self, next_frame):
         '''manage the interaction between the user and the image directory to select a pbm image'''
-        keep = True
-        while keep:
+        filename = ''
+        while filename == '':
             try:
-                self.filename =  filedialog.askopenfilename(initialdir = "\img",title = "Select file",filetypes = (("pbm files","*.pbm"),)) #filetypes = (("jpeg files","*.jpg"),("all files","*.*"))
+                filename =  filedialog.askopenfilename(initialdir = "\img",title = "Select file",filetypes = (("pbm files","*.pbm"),)) #filetypes = (("jpeg files","*.jpg"),("all files","*.*"))
                 self.img= PhotoImage(file =self.filename)
-                #resize iamge to dispaly, both zoom and subsample were needed as proved by testing
+                self.img_canvas = ImgCanvas(self.filename)
+                #resize image to dispaly, both zoom and subsample were needed as proved by testing
                 self.scale_w = int(self.img.height()/180)*2
                 self.img = self.img.zoom(2)
                 if self.scale_w > 0 : self.img = self.img.subsample(self.scale_w)
@@ -127,110 +128,115 @@ class Justeg:
                 self.img_label.grid(row=1, column = 2, rowspan=2, sticky="N")
                 self._img_original.grid(row=0, column = 2)
                 
-                if self.filename == '':
-                    #in case the file log is closed without selecting an image
+                if not self.img_canvas.has_image():
                     keep = False
                 else:
                     keep = False
-                    self.change_page(self.frames_name.index(next_frame))
-                    #note that file log have .pbm as required format therefore the user is not allowed to select anything else
-                    #so no further error prevention is needed
+
             except IOError as e:
-                #In case file not found a popup message is already sent by the interface, this is to have more info about the essor
-                print("Couldn't open the file {}".format(self.filename))
-            
+                # In case file not found a popup message is already sent by the interface, this is to have more info about the essor
+                print("Couldn't open the file {}".format(filename))
 
-    def open_in_bin(self, image):
-        '''given a pbm image creates a list with its colour values and a variable which holds the length of its header'''
-        file = open(image, "rb")
+        self.change_page(self.frames_name.index(next_frame))
+        # note that file log have .pbm as required format therefore the user is not allowed to select anything else
+        # so no further error prevention is needed
+
+    def show_encrypt(self):
+        return
     
-        lines = file.read()
-        #needed because sometimes bytearray express with b"...." and other times as b'....'
-        raw = str(lines).replace("b'","").replace('b"',"").split("\\n")
-        self.width=raw[1]
-        self.height=raw[2]
-        header=raw[:4]
+    # def encrypt(self):
+    #     '''given the colour channels and a number of ASCII character changes the lats 2 digits channels values with the binary value of the text'''
+    #     if all(ord(char) < 128 for char in self.inputbox.get('1.0', END)):
+    #         #open image
+    #         channels = '' #self.open_in_bin(self.filename)
+    #         #convert input message into binary
+    #         bin_txt=''
+    #         for letter in self.inputbox.get('1.0', END):
+    #             bin_txt += format(ord(letter), '07b') #each character will be express in 7 bits ASCII code
+    #
+    #         """append the end of transimition character, note that as the message in binary is
+    #         encrypted and read 2 at the time is the tot num of digits is odd the program chould skip the sign as proved by testing"""
+    #         if len(bin_txt) % 2 == 0:
+    #              bin_txt += '00000100' #if the lenth is even add 8 bits
+    #         else:
+    #             bin_txt += '0000100' #end of transmittion
+    #
+    #         if len(bin_txt) <= 2*(len(channels)-self.skip):
+    #             """tot number of bits in txt less or equal than number of channels in the image excluding first 12 (header info)
+    #             times 2 because we are changing the 2 least significant bits for each colour channel"""
+    #
+    #             #start at 11 to skip the header info
+    #             for i in range(self.skip,len(channels)):
+    #                 if bin_txt != "":
+    #                     #print(channels[i], end=" --> ")
+    #                     channels[i]=channels[i][:-2]+str(bin_txt[:2]) #last 2 bit of channel changed with first 2 of bin_text
+    #                     #print(channels[i])
+    #                     bin_txt = bin_txt[2:]
+    #                 else:
+    #                     break
+    #         else:
+    #             self.error_label.configure(text="{} characters entered, only {} allowed".format(len(bin_txt), 2*(len(channels)-20)))
+    #             self.error_label.grid(row=0, column=0, sticky=W+E, columnspan=2, padx=10)
+    #
+    #         #print(channels)#see the difference now that every 3 items is zero
+    #         for i in range(len(channels)):
+    #             channels[i] = int(channels[i], 2) #transform in dec for bytearray
+    #         #translate back to byte
+    #         byte_img = bytearray(channels)
+    #         #print(byte_img)
+    #
+    #         #while copy_file != ''
+    #         #try:
+    #         copy_filename =  filedialog.asksaveasfilename(initialdir = "\img",title = "Save Encrypted image", defaultextension=".pbm", filetypes = (("pbm files","*.pbm"),))
+    #
+    #         copy_file = open(copy_filename, 'wb')
+    #         copy_file.write(byte_img)
+    #         copy_file.close()
+    #
+    #         #encryption frame_______________Image_______________#
+    #         self.img2 = PhotoImage(file = copy_filename) #test3.pbm
+    #         self.img2 = self.img2.zoom(2) #with 250, I ended up running out of memory
+    #         if self.scale_w > 0 : self.img2 = self.img2.subsample(self.scale_w)
+    #         #self.img2 = self.img2.subsample(10)
+    #         self.img_label2 = Label(self.frames[self.frames_name.index("encryption")], image=self.img2)
+    #         self._img_en.grid(row=3, column = 2)
+    #         self.img_label2.grid(row=4, column = 2) #, padx= 2, pady=2
+    #
+    #         #clear the entry box and display that message have been ecrypted
+    #         self.inputbox.delete("0.0", END)
+    #         self.result_label.configure(text="message encrypted successfully", bg="#FF980A")
+    #         self.submit.configure(state= 'disabled') #no possible to click button after decryption
+    #     else:
+    #         self.result_label.configure(text="enter ASCII code only", bg="#d00")
+    #
+    #     self.result_label.grid(row=1, column = 0, columnspan=2, sticky=W+E, padx=120, pady=10)
 
-        for h in header:
-            self.skip += len(str(h))
-                        
-        channels =[] #because lines not usable as list
-        for line in lines:
-            channels.append("{0:08b}".format(line))
-
-        file.close()
-        return channels
-    
-    def encrypt(self):
-        '''given the colour channels and a number of ASCII character changes the lats 2 digits channels values with the binary value of the text'''
-        if all(ord(char) < 128 for char in self.inputbox.get('1.0', END)):
-            #open image
-            channels = self.open_in_bin(self.filename)
-            #convert input message into binary
-            bin_txt=''
-            for letter in self.inputbox.get('1.0', END):
-                bin_txt += format(ord(letter), '07b') #each character will be express in 7 bits ASCII code
-
-            """append the end of transimition character, note that as the message in binary is
-            encrypted and read 2 at the time is the tot num of digits is odd the program chould skip the sign as proved by testing"""
-            if len(bin_txt) % 2 == 0:
-                 bin_txt += '00000100' #if the lenth is even add 8 bits
-            else:
-                bin_txt += '0000100' #end of transmittion
-
-            if len(bin_txt) <= 2*(len(channels)-self.skip):
-                """tot number of bits in txt less or equal than number of channels in the image excluding first 12 (header info)
-                times 2 because we are changing the 2 least significant bits for each colour channel"""
-
-                #start at 11 to skip the header info
-                for i in range(self.skip,len(channels)):
-                    if bin_txt != "":
-                        #print(channels[i], end=" --> ")
-                        channels[i]=channels[i][:-2]+str(bin_txt[:2]) #last 2 bit of channel changed with first 2 of bin_text
-                        #print(channels[i])
-                        bin_txt = bin_txt[2:]
-                    else:
-                        break
-            else:
-                self.error_label.configure(text="{} characters entered, only {} allowed".format(len(bin_txt), 2*(len(channels)-20)))
-                self.error_label.grid(row=0, column=0, sticky=W+E, columnspan=2, padx=10)
-
-            #print(channels)#see the difference now that every 3 items is zero
-            for i in range(len(channels)):
-                channels[i] = int(channels[i], 2) #transform in dec for bytearray
-            #translate back to byte
-            byte_img = bytearray(channels)
-            #print(byte_img)
-
-            #while copy_file != ''
-            #try:
-            copy_filename =  filedialog.asksaveasfilename(initialdir = "\img",title = "Save Encrypted image", defaultextension=".pbm", filetypes = (("pbm files","*.pbm"),))
-
-            copy_file = open(copy_filename, 'wb')
-            copy_file.write(byte_img)
-            copy_file.close()
-
-            #encryption frame_______________Image_______________#
-            self.img2 = PhotoImage(file = copy_filename) #test3.pbm
-            self.img2 = self.img2.zoom(2) #with 250, I ended up running out of memory
-            if self.scale_w > 0 : self.img2 = self.img2.subsample(self.scale_w)
-            #self.img2 = self.img2.subsample(10)
-            self.img_label2 = Label(self.frames[self.frames_name.index("encryption")], image=self.img2)
-            self._img_en.grid(row=3, column = 2)
-            self.img_label2.grid(row=4, column = 2) #, padx= 2, pady=2
-
-            #clear the entry box and display that message have been ecrypted
-            self.inputbox.delete("0.0", END)
-            self.result_label.configure(text="message encrypted successfully", bg="#FF980A")
-            self.submit.configure(state= 'disabled') #no possible to click button after decryption
-        else:
-            self.result_label.configure(text="enter ASCII code only", bg="#d00")
-
-        self.result_label.grid(row=1, column = 0, columnspan=2, sticky=W+E, padx=120, pady=10)
+    # def decryption(self):
+    #     '''given a list of colour channels reads the last 2 of each channel and translate them in characters using ASCII'''
+    #     channels = self.img_canvas.get_bin_channels()
+    #
+    #     bin_txt = ''
+    #     text = ''
+    #     for i in range(self.skip, len(channels)):  # len(channels)
+    #         # print(channels[i], end="*")
+    #         bin_txt += channels[i][-2:]
+    #
+    #     while bin_txt != '':
+    #         # print(bin_txt[:7], end="-->")
+    #         if bin_txt[:7] == '0000100' or bin_txt[
+    #                                        :8] == '00000100':  # in case of error 0000010 is start transimission  which is still a character not used
+    #             bin_txt = ''  # to end loop as all message have been read
+    #         else:
+    #             text += chr(int('0' + bin_txt[:7], 2))
+    #             bin_txt = bin_txt[7:]
+    #     self.clear()
+    #     self.message_label.configure(state='normal')
+    #     self.message_label.insert(END, text)
+    #     self.message_label.configure(state='disabled')
+    #     self.submit_decry.configure(state='disabled')  # no possible to click button after decryption
 
     def show_decryption(self):
-        channels = self.open_in_bin(self.filename)
-        text = encoder.decryption(channels)
+        text = encoder.decryption(self.img_canvas)
 
         self.clear()
         self.message_label.configure(state='normal')
@@ -251,7 +257,7 @@ if __name__ == '__main__':
     root.geometry("1100x720+20+0")
     root.title("justeg")
     root.configure(background="#f4F7FF")
-    interface = Justeg(root)
+    interface = JustegGui(root)
     root.mainloop()
      
 

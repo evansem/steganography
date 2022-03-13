@@ -1,4 +1,7 @@
-import config
+# encoder.py
+
+# Developed by Emanuel Evans
+# first released: 13/3/22
 
 
 # def encrypt(self):
@@ -71,25 +74,33 @@ import config
 #
 #     self.result_label.grid(row=1, column=0, columnspan=2, sticky=W + E, padx=120, pady=10)
 
+def has_message_terminated(bin_txt):
+    """
+    Look out for the end of transmission character
+    :param bin_text: the image binary stream
+    :return: all the encoded message has been read
+    """
+    # in case of error 0000010 is start transmission which is still a character not used
+    return bin_txt[:7] == '0000100' or bin_txt[:8] == '00000100'
 
-def decryption(channels):
-    """given a list of colour channels reads the last 2 of each channel and translate them in characters using ASCII"""
+
+def decryption(img_canvas):
+    """
+    Extract the list of colour channels from an image,
+    Then it reads the last 2 of each channel and translate them in characters using ASCII
+    :param img_canvas: custom img wrapper
+    """
+    channels = img_canvas.get_bin_channels()
 
     bin_txt = ''
     text = ''
 
-    prefix = config.pbm["prefix"]
-
-    for i in range(prefix, len(channels)):
+    for i in range(img_canvas.prefix, len(channels)):
         # print(channels[i], end="*")
         bin_txt += channels[i][-2:]
 
-    while bin_txt != '':
-        # print(bin_txt[:7], end="-->")
-        if bin_txt[:7] == '0000100' or bin_txt[:8] == '00000100':
-            # in case of error 0000010 is start transimission which is still a character not used
-            bin_txt = ''  # to end loop as all message have been read
-        else:
-            text += chr(int('0' + bin_txt[:7], 2))
-            bin_txt = bin_txt[7:]
+    while not has_message_terminated(bin_txt):
+        text += chr(int('0' + bin_txt[:7], 2))
+        bin_txt = bin_txt[7:]
+
     return text
