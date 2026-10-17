@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FaviconPanel } from "./FaviconPanel";
 import { HidePanel } from "./HidePanel";
 import { RevealPanel } from "./RevealPanel";
 import styles from "./Workbench.module.css";
@@ -15,6 +16,7 @@ interface Tab {
 const TABS: Tab[] = [
   { id: "hide", label: "Hide", blurb: "Write a message into an image", render: () => <HidePanel /> },
   { id: "reveal", label: "Reveal", blurb: "Recover a message from an image", render: () => <RevealPanel /> },
+  { id: "favicon", label: "Favicon", blurb: "Read any website's icon", render: () => <FaviconPanel /> },
 ];
 
 export function Workbench() {
