@@ -1,4 +1,21 @@
-
+# editors
 .idea/
+.vscode/
 
+# python (legacy)
 __pycache__/
+
+# node / next
+node_modules/
+.next/
+out/
+next-env.d.ts
+*.tsbuildinfo
+
+# env
+.env*
+!.env.example
+
+# misc
+.DS_Store
+coverage/
