@@ -1,12 +1,133 @@
+/* ==========================================================================
+   Justeg design tokens. The look is "blacklight": ink-dark surfaces, UV
+   violet light, and fluorescent ink that only shows where the light falls.
+   ========================================================================== */
+
+:root {
+  color-scheme: dark;
+
+  --ink: #07060b;
+  --ink-2: #0e0c16;
+  --ink-3: #161322;
+  --line: rgb(236 232 245 / 0.09);
+  --line-strong: rgb(236 232 245 / 0.18);
+  --paper: #ece8f5;
+  --muted: #9d96b4;
+  --faint: #6c6684;
+
+  --uv: #8b5cff;
+  --uv-bright: #b197ff;
+  --uv-soft: rgb(139 92 255 / 0.16);
+  --glow: #d4ff3a;
+  --glow-soft: rgb(212 255 58 / 0.14);
+  --danger: #ff6b86;
+
+  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
+  --font-ui: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+
+  --radius: 18px;
+  --radius-sm: 10px;
+  --gutter: clamp(16px, 4vw, 48px);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* pointer position, updated by <Blacklight /> */
+  --mx: 50vw;
+  --my: 30vh;
+}
+
 *,
 *::before,
 *::after {
   box-sizing: border-box;
 }
 
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
-  background: #07060b;
-  color: #ece8f5;
-  font-family: system-ui, sans-serif;
+  min-height: 100dvh;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-ui);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--glow);
+  color: var(--ink);
+}
+
+a {
+  color: inherit;
+}
+
+:focus-visible {
+  outline: 2px solid var(--glow);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+button,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--uv-bright);
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(36px, 5vw, 60px);
+  line-height: 1.02;
+  letter-spacing: -0.01em;
+  margin: 12px 0 0;
+}
+
+.section-title em {
+  color: var(--glow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

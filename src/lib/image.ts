@@ -1,0 +1,107 @@
+import type { ImageLike } from "@/lib/stego";
+
+/** Hard limits keep memory bounded on phones (NFR-P2). */
+export const MAX_FILE_BYTES = 25 * 1024 * 1024;
+export const MAX_PIXELS = 24_000_000;
+
+export class ImageInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "ImageInputError";
+  }
+}
+
+export interface LoadedImage extends ImageLike {
+  name: string;
+}
+
+/**
+ * Decodes any browser-supported image into raw RGBA pixels. Colour space
+ * conversion is disabled so the stored bits are read back exactly.
+ */
+export async function decodeImage(blob: Blob, name = "image"): Promise<LoadedImage> {
+  if (blob.size > MAX_FILE_BYTES) {
+    throw new ImageInputError(`That file is ${(blob.size / 1e6).toFixed(1)} MB. The limit is 25 MB.`);
+  }
+  if (blob.type && !blob.type.startsWith("image/")) {
+    throw new ImageInputError("That file is not an image.");
+  }
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(blob, { premultiplyAlpha: "none", colorSpaceConversion: "none" });
+  } catch {
+    throw new ImageInputError("This browser could not decode that image.");
+  }
+
+  const { width, height } = bitmap;
+  if (width * height > MAX_PIXELS) {
+    bitmap.close();
+    throw new ImageInputError(`That image is ${width}×${height}. Please use one under 24 megapixels.`);
+  }
+
+  const ctx = makeContext(width, height);
+  ctx.drawImage(bitmap, 0, 0);
+  bitmap.close();
+  const { data } = ctx.getImageData(0, 0, width, height);
+  return { data, width, height, name };
+}
+
+/** Encodes RGBA pixels as a lossless PNG. */
+export async function encodePng(data: Uint8ClampedArray, width: number, height: number): Promise<Blob> {
+  const ctx = makeContext(width, height);
+  ctx.putImageData(new ImageData(new Uint8ClampedArray(data), width, height), 0, 0);
+  return new Promise((resolve, reject) =>
+    ctx.canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("PNG encoding failed."))), "image/png"),
+  );
+}
+
+/** Renders pixels to an object URL for previews. Caller revokes it. */
+export async function toObjectUrl(data: Uint8ClampedArray, width: number, height: number): Promise<string> {
+  return URL.createObjectURL(await encodePng(data, width, height));
+}
+
+/**
+ * Amplifies the lowest bit of every channel to full brightness. Natural
+ * photos look like noise here; a sequential plain message shows up as a
+ * band across the top of the image.
+ */
+export function bitPlane(data: Uint8ClampedArray): Uint8ClampedArray {
+  const out = new Uint8ClampedArray(data.length);
+  for (let i = 0; i < data.length; i += 4) {
+    out[i] = (data[i]! & 1) * 255;
+    out[i + 1] = (data[i + 1]! & 1) * 255;
+    out[i + 2] = (data[i + 2]! & 1) * 255;
+    out[i + 3] = 255;
+  }
+  return out;
+}
+
+/** Highlights every changed channel between two images. */
+export function difference(a: Uint8ClampedArray, b: Uint8ClampedArray): { pixels: Uint8ClampedArray; changed: number } {
+  const out = new Uint8ClampedArray(a.length);
+  let changed = 0;
+  for (let i = 0; i < a.length; i += 4) {
+    let hit = false;
+    for (let c = 0; c < 3; c++) {
+      if (a[i + c] !== b[i + c]) {
+        hit = true;
+        changed++;
+      }
+    }
+    out[i] = hit ? 212 : 12;
+    out[i + 1] = hit ? 255 : 10;
+    out[i + 2] = hit ? 58 : 20;
+    out[i + 3] = 255;
+  }
+  return { pixels: out, changed };
+}
+
+function makeContext(width: number, height: number): CanvasRenderingContext2D {
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true, colorSpace: "srgb" });
+  if (!ctx) throw new Error("Canvas is not available.");
+  return ctx;
+}

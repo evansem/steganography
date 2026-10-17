@@ -1,0 +1,52 @@
+.hero {
+  position: relative;
+  padding-block: clamp(56px, 10vw, 120px) clamp(40px, 6vw, 72px);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(64px, 13vw, 168px);
+  line-height: 0.86;
+  letter-spacing: -0.03em;
+  margin: 18px 0 0;
+}
+
+.title em {
+  font-style: italic;
+  color: var(--glow);
+  text-shadow: 0 0 40px rgb(212 255 58 / 0.35);
+}
+
+.copy {
+  position: relative;
+  max-width: 560px;
+  margin-top: 32px;
+}
+
+.lede {
+  margin: 0;
+  font-size: clamp(17px, 1.6vw, 20px);
+  color: var(--muted);
+}
+
+.secret {
+  font-size: clamp(14px, 1.4vw, 16px);
+}
+
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 28px;
+  list-style: none;
+  padding: 0;
+  margin: 40px 0 0;
+  font-size: 14px;
+  color: var(--faint);
+}
+
+.facts span {
+  font-family: var(--font-mono);
+  color: var(--paper);
+  margin-right: 6px;
+}
