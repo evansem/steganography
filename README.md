@@ -1,61 +1,58 @@
-# Steganography
+# Justeg
 
-A cool little project to encode messages inside images, this program is also known as **Justeg**.
+**Hide words in plain sight.** Justeg is a browser steganography lab: it writes a secret message into the lowest bits of an image's pixels, optionally encrypted, and reads it back. Nothing is uploaded; every pixel is processed on your device.
 
-This name comes from the concept of this project, just a simple **steg**anography software.
-Moreover, I like the name because it somewhat resembles Easter eggs which are features that 
-developers hide in their programs as a joke. This links to one of the common usages of this program, 
-which is to hide funny messages in small images or websites' favicon.
+![Justeg hero](docs/images/hero.png)
 
-## Disclaimer
-This is not a secure cryptography algorithm. Due to the absence of a secret key 
-whoever has a copy of the code or knows how the algorithm work can decrypt the message.
-The main strength of my approach is that people would really think to look there.
-This is because when messages are added, images will still look the same as the 
-original ones. Have a go yourself, you will probably find it hard to notice 
-the difference by eye.
+The name comes from the idea behind it: **ju**st a simple **steg**anography tool. It also sounds a bit like an Easter egg, the hidden jokes developers leave in their programs, which is exactly what Justeg is for: hiding funny messages in small images or a website's favicon.
 
-In the end, Justeg is just a funny way to hide messages inside images.
+## What it does
 
+- **Hide** any Unicode message in a PNG, JPEG, WebP, GIF, BMP or ICO and download the result as a lossless PNG.
+- **Encrypt** with a passphrase: AES-256-GCM, a PBKDF2-SHA256 key (600k iterations), and bits scattered across the image by a keyed permutation. Without the passphrase there is nothing to find.
+- **Reveal** messages, with automatic detection of 1- or 2-bit depth and tamper detection.
+- **Inspect** any image's lowest bit plane, and after hiding, see a map of every channel that changed.
+- **Read favicons** from any website. Try Justeg's own icon: there is an egg in it.
 
-## Virgil the guide through justeg's inferno
+| Hide, then inspect the changes | Read a favicon |
+|---|---|
+| ![Changes view](docs/images/hide-changes.png) | ![Favicon Easter egg](docs/images/favicon-egg.png) |
 
-It is important to note that at the current stage this program only allows encrypting ASCII characters.
-Furthermore, encryption and decryption operations can only be applied to images in a pbm format.
+## Engineering
 
-![](doc/homepage.png)
+| | |
+|---|---|
+| [Requirements](docs/requirements.md) | Functional and non-functional requirements with IDs |
+| [Architecture](docs/architecture.md) | Modules, data formats, flows and test strategy |
+| [Threat model](docs/threat-model.md) | STRIDE analysis and honest limits |
+| [Decisions](docs/adr/) | Why client-side, why a length header, why Feistel, how the proxy is hardened |
+| [Deployment](docs/deployment.md) | Hostinger Business Node.js hosting, and running locally |
 
-## Encryption
-1. Start by clicking Encryption in the menu frame
-2. Then you will be prompted to select a .pbm file through your normal os file dialog.
-   Default a folder with some sample images will be opened, feel free to use them or covert your own images (jpg/png) to pbm using GIMP or other editing software
-3. After that the encryption frame will be displayed. Containing a text-box where you can type your message to encrypt,
-   and the preview of the image that you selected.
-4. When you are feeling confident with what you have written press the button 
-   'save message in a new image' and Justeg will do the magic
-5. Now a file dialog will prompt you to choose where to save the image containing the hidden message
-6. Finally, a preview of both images will be displayed to show you that the difference is unnoticeable 
+**Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, Vitest, ESLint, GitHub Actions.
 
-Before                            |  After
-:--------------------------------:|:-------------------------:
-![](doc/encrypt_screenshot.png)   |  ![](doc/encrypt_screenshot_success.png)
+## Quick start
 
-## Decryption
-1. Start by clicking Decryption in the menu frame
-2. Then you will be prompted to select a file through your normal os file dialog.
-3. After that the selected image will be displayed on screen (note that this does not imply that a message is hidden in it)
+```bash
+npm ci
+npm run dev
+```
 
-4. Finally, click 'get message' and the message will be shown in the box below
+Then open http://localhost:3000. See [deployment](docs/deployment.md) for production.
 
-5. If needed you can use the bar on the right to scroll up and down to read the message.
+## Limits
 
-**Note:** Once the message is on the screen there is no timer, it will remain until you go back to the menu or you quit the program 
-Once you do so the message will still be inside the image
+LSB steganography does not survive lossy recompression. Re-saving as JPEG, resizing or sending through most chat and social apps destroys the message, so share the PNG as a file. Statistical analysis can suggest that an image was edited even when it cannot read the message. Unencrypted mode is hidden, not secret.
 
-Before                            |  After
-:--------------------------------:|:-------------------------:
-![](doc/decrypt_screenshot.png)   |  ![](doc/decrypt_screenshot_success.png)
+## History
 
-## Erasing encrypted message
-to delete the message inside the image you can either delete the .pbm image or overwrite a new message
+Justeg started in 2022 as a Python/Tkinter desktop app that hid 7-bit ASCII in PBM images with an end-of-transmission marker. That version lives in [`legacy/python`](legacy/python). Version 2 keeps the idea and fixes its weaknesses: no encryption, a predictable marker, sequential embedding and ASCII-only text.
 
+<details>
+<summary>Screenshots of the 2022 version</summary>
+
+| Before | After |
+|:---:|:---:|
+| ![](doc/encrypt_screenshot.png) | ![](doc/encrypt_screenshot_success.png) |
+| ![](doc/decrypt_screenshot.png) | ![](doc/decrypt_screenshot_success.png) |
+
+</details>
