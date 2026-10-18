@@ -1,6 +1,6 @@
 /**
  * Fixed-window rate limiter kept in process memory. It is a best-effort
- * guard for a single Node instance, which is how Hostinger runs the app.
+ * guard for a single Node instance.
  */
 export function createRateLimiter(limit: number, windowMs: number) {
   const hits = new Map<string, { count: number; resetAt: number }>();
