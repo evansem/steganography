@@ -26,7 +26,6 @@ The name comes from the idea behind it: **ju**st a simple **steg**anography tool
 | [Architecture](docs/architecture.md) | Modules, data formats, flows and test strategy |
 | [Threat model](docs/threat-model.md) | STRIDE analysis and honest limits |
 | [Decisions](docs/adr/) | Why client-side, why a length header, why Feistel, how the proxy is hardened |
-| [Deployment](docs/deployment.md) | Hostinger Business Node.js hosting, and running locally |
 
 **Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, Vitest, ESLint, GitHub Actions.
 
@@ -37,7 +36,9 @@ npm ci
 npm run dev
 ```
 
-Then open http://localhost:3000. See [deployment](docs/deployment.md) for production.
+Then open http://localhost:3000.
+
+For production, any Node.js 20.9+ host works: `npm ci`, `npm run build`, then `npm start`. The favicon reader needs a Node runtime, so a purely static host is not enough.
 
 ## Limits
 

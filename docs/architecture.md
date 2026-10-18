@@ -15,7 +15,7 @@ flowchart TB
     Stego --> WebCrypto[(Web Crypto API)]
     FaviconPanel --> RevealPanel
   end
-  subgraph Server["Node.js on Hostinger"]
+  subgraph Server["Node.js server"]
     Route["app/api/favicon/route.ts"] --> Favicon["lib/favicon<br/>discover, safeFetch,<br/>sniff, rate limit"]
   end
   FaviconPanel -- "GET /api/favicon?site=" --> Route

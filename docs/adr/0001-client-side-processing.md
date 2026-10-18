@@ -13,6 +13,6 @@ All decoding, embedding, encryption and encoding happens in the browser. The ser
 ## Consequences
 
 - Privacy is a property of the architecture, not a policy promise (NFR-S1).
-- Server cost on the Hostinger plan stays near zero: the page is static.
+- Server cost stays near zero: the page is static.
 - The core must avoid Node-only APIs. It uses Web Crypto, available in both browsers and Node 20+, so it is still unit tested in Node.
 - Very large images are limited by the device's memory, hence the 24 MP cap.
