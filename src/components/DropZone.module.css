@@ -1,0 +1,53 @@
+.zone {
+  position: relative;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 8px;
+  min-height: 280px;
+  padding: 32px 20px;
+  text-align: center;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius);
+  background:
+    linear-gradient(var(--ink-2), var(--ink-2)) padding-box,
+    repeating-linear-gradient(45deg, transparent 0 10px, rgb(139 92 255 / 0.03) 10px 20px);
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease), transform 0.2s var(--ease);
+}
+
+.zone:hover,
+.over {
+  border-color: var(--uv);
+  background-color: var(--uv-soft);
+}
+
+.over {
+  transform: scale(1.01);
+}
+
+.zone:has(input:focus-visible) {
+  outline: 2px solid var(--glow);
+  outline-offset: 3px;
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  color: var(--uv-bright);
+  background: var(--uv-soft);
+  box-shadow: 0 0 40px rgb(139 92 255 / 0.35);
+}
+
+.label {
+  font-weight: 600;
+  font-size: 17px;
+}
+
+.hint {
+  font-size: 13px;
+  color: var(--faint);
+}

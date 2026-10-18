@@ -1,0 +1,128 @@
+.stage {
+  margin: 0;
+  display: grid;
+  gap: 12px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.views {
+  display: inline-flex;
+  padding: 4px;
+  gap: 4px;
+  border-radius: 999px;
+  background: var(--ink-3);
+  border: 1px solid var(--line);
+}
+
+.view {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  font-size: 13px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+}
+
+.view:hover:not(:disabled):not([aria-pressed="true"]) {
+  color: var(--paper);
+}
+
+.view[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.view:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.clear {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  background: transparent;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.clear:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.frame {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-height: 280px;
+  max-height: 520px;
+  overflow: hidden;
+  border-radius: var(--radius);
+  border: 1px solid var(--line);
+  background:
+    repeating-conic-gradient(var(--ink-3) 0 25%, var(--ink-2) 0 50%) 0 0 / 20px 20px;
+}
+
+.img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-height: 520px;
+  object-fit: contain;
+}
+
+.small .img {
+  image-rendering: pixelated;
+}
+
+.forensic .img {
+  image-rendering: pixelated;
+}
+
+.forensic {
+  box-shadow: inset 0 0 0 1px rgb(212 255 58 / 0.3), 0 0 60px rgb(212 255 58 / 0.08);
+}
+
+.scan {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 0 46%, rgb(139 92 255 / 0.22) 50%, transparent 54%);
+  background-size: 100% 220%;
+  animation: scan 3.6s linear infinite;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.forensic .scan {
+  opacity: 1;
+}
+
+@keyframes scan {
+  from { background-position: 0 110%; }
+  to { background-position: 0 -110%; }
+}
+
+.caption {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 16px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--faint);
+  overflow-wrap: anywhere;
+}
+
+.changed {
+  color: var(--glow);
+}

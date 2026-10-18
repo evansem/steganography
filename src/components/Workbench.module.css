@@ -1,0 +1,124 @@
+.section {
+  position: relative;
+  padding-block: clamp(32px, 6vw, 72px);
+}
+
+.head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  justify-content: space-between;
+  gap: 16px 32px;
+  margin-bottom: 28px;
+}
+
+.local {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--glow);
+  box-shadow: 0 0 12px var(--glow);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% { opacity: 0.35; }
+}
+
+.card {
+  position: relative;
+  border-radius: calc(var(--radius) + 8px);
+  border: 1px solid var(--line);
+  background: linear-gradient(180deg, rgb(22 19 34 / 0.85), rgb(14 12 22 / 0.92));
+  backdrop-filter: blur(18px);
+  box-shadow: 0 40px 120px -40px rgb(139 92 255 / 0.35);
+  overflow: hidden;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, rgb(139 92 255 / 0.6), transparent 35%, transparent 65%, rgb(212 255 58 / 0.35));
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.tabs {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(0, 1fr);
+  border-bottom: 1px solid var(--line);
+}
+
+.tab {
+  position: relative;
+  display: grid;
+  gap: 2px;
+  padding: 18px clamp(16px, 2.4vw, 28px);
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  color: var(--muted);
+  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
+}
+
+.tab + .tab {
+  border-left: 1px solid var(--line);
+}
+
+.tab:hover {
+  color: var(--paper);
+}
+
+.tab[aria-selected="true"] {
+  color: var(--paper);
+  background: rgb(139 92 255 / 0.07);
+}
+
+.tab[aria-selected="true"]::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: linear-gradient(90deg, var(--uv), var(--glow));
+  box-shadow: 0 0 16px var(--uv);
+}
+
+.tabLabel {
+  font-family: var(--font-display);
+  font-size: clamp(24px, 3vw, 32px);
+  line-height: 1;
+}
+
+.tabBlurb {
+  font-size: 13px;
+  color: var(--faint);
+}
+
+@media (max-width: 560px) {
+  .tabBlurb {
+    display: none;
+  }
+}
+
+.panel {
+  padding: clamp(16px, 3vw, 32px);
+}
