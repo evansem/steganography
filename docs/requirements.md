@@ -51,6 +51,13 @@ This document states what the app must do (functional requirements), how well it
 | FR-13 | The user can enter a website address and the app fetches that site's favicon. |
 | FR-14 | The fetched icon opens in the reveal tool so it can be inspected and read like any other image. |
 | FR-15 | Justeg's own favicon carries a hidden message, so the feature can be demonstrated without a third-party site. |
+| FR-16 | A fetched favicon is cached for 24 hours, so repeat lookups of the same site are answered without contacting it. |
+
+### Usage
+
+| ID | Requirement |
+|---|---|
+| FR-17 | The footer shows anonymous running totals of messages hidden, messages revealed and icons read. |
 
 ## Non-functional requirements
 
@@ -62,17 +69,19 @@ This document states what the app must do (functional requirements), how well it
 | NFR-S2 | Encrypted messages use authenticated encryption (AES-256-GCM) with a key derived from the passphrase by PBKDF2-SHA256 at ≥ 600,000 iterations and a random 16-byte salt per image. |
 | NFR-S3 | Encrypted payloads carry no fixed signature, and their bits are scattered across the image by a key-dependent permutation. |
 | NFR-S4 | The favicon proxy cannot be used for server-side request forgery: it reaches only public http(s) hosts on standard ports, re-checks every redirect, validates the resolved IP address at connect time, enforces size and time limits, and returns only raster images verified by their magic bytes. |
-| NFR-S5 | The favicon proxy is rate limited per client. |
+| NFR-S5 | The favicon proxy and the stats endpoint are rate limited per client, and the limits survive restarts when a database is configured. |
 | NFR-S6 | Every response sends a restrictive Content-Security-Policy and standard hardening headers (nosniff, frame denial, Referrer-Policy, Permissions-Policy, COOP, HSTS). |
 | NFR-S7 | No third-party scripts, fonts or trackers are loaded. |
 | NFR-S8 | Runtime dependencies have no known high-severity vulnerabilities, checked in CI. |
+| NFR-S9 | The database stores no images, messages, passphrases, file names or IP addresses. Rate-limit keys are keyed hashes of the client address. |
+| NFR-S10 | Database credentials and secrets come only from environment variables and are never committed. |
 
 ### Correctness and quality
 
 | ID | Requirement |
 |---|---|
 | NFR-Q1 | The steganography core is pure TypeScript with no browser or framework dependencies, so it can be unit tested in Node. |
-| NFR-Q2 | Every pull request must pass lint, type-check, unit tests and a production build in CI. |
+| NFR-Q2 | Every pull request must pass lint, type-check, unit tests, database tests against MariaDB and a production build in CI. |
 | NFR-Q3 | Round-trip tests cover both bit depths, both modes, Unicode, empty and exactly-full messages, wrong passphrases and tampering. |
 
 ### Performance
@@ -98,6 +107,11 @@ This document states what the app must do (functional requirements), how well it
 |---|---|
 | NFR-O1 | The app deploys to Hostinger Business web hosting as a Node.js web app built with `npm run build` and run with `npm start`. |
 | NFR-O2 | The app runs on Node.js 20.9 or later. |
+| NFR-O3 | Server-side state is kept in the MySQL database included with Hostinger Business, reached on `localhost`. SQL is compatible with MySQL 8 and MariaDB 10.x. |
+| NFR-O4 | The schema is created and upgraded automatically on first use, without shell access, and can alternatively be imported through phpMyAdmin. |
+| NFR-O5 | The app runs without a database (in-memory stores) for local development and tests. |
+| NFR-O6 | `GET /api/health` reports whether the app and its database are working. |
+| NFR-O7 | The app opens at most 5 database connections per process. |
 
 ## Out of scope
 

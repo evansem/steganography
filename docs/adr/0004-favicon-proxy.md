@@ -21,4 +21,4 @@ Add `GET /api/favicon?site=…`, which fetches the icon server-side and returns 
 
 - The app needs a Node runtime rather than a pure static export. Hostinger Business supports Node.js apps.
 - The proxy sees which sites a visitor looks up, but never their images.
-- The in-memory rate limiter does not coordinate across instances. Hostinger runs one instance per app, so this is acceptable.
+- The rate limiter and an icon cache are stored in MySQL when a database is configured ([ADR 0005](0005-mysql-on-hostinger.md)), so limits survive restarts. Without one they fall back to memory.

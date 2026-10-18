@@ -23,12 +23,12 @@ The name comes from the idea behind it: **ju**st a simple **steg**anography tool
 | | |
 |---|---|
 | [Requirements](docs/requirements.md) | Functional and non-functional requirements with IDs |
-| [Architecture](docs/architecture.md) | Modules, data formats, flows and test strategy |
+| [Architecture](docs/architecture.md) | Modules, data formats, data layer, flows and test strategy |
 | [Threat model](docs/threat-model.md) | STRIDE analysis and honest limits |
-| [Decisions](docs/adr/) | Why client-side, why a length header, why Feistel, how the proxy is hardened |
-| [Deployment](docs/deployment.md) | Hostinger Business Node.js hosting, and running locally |
+| [Decisions](docs/adr/) | Why client-side, why a length header, why Feistel, how the proxy is hardened, why MySQL |
+| [Deployment](docs/deployment.md) | Hostinger Business: Node.js web app and MySQL database, and running locally |
 
-**Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, Vitest, ESLint, GitHub Actions.
+**Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, MySQL (`mysql2`), Vitest, ESLint, GitHub Actions.
 
 ## Quick start
 
@@ -37,7 +37,7 @@ npm ci
 npm run dev
 ```
 
-Then open http://localhost:3000. See [deployment](docs/deployment.md) for production.
+Then open http://localhost:3000. No database is needed locally. See [deployment](docs/deployment.md) to host it with a database on Hostinger.
 
 ## Limits
 

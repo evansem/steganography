@@ -10,6 +10,7 @@ This is a lightweight STRIDE analysis of Justeg v2. It explains what Justeg prot
 | The fact that a message exists | Steganography's promise is that nobody suspects a message. |
 | The user's images | Personal photos should not leave the device. |
 | The server and its network | The favicon proxy makes outbound requests on behalf of visitors. |
+| The database and its credentials | Holds rate-limit state, cached icons and counters; the credentials grant access to the hosting account's MySQL. |
 
 ## Trust boundaries
 
@@ -18,17 +19,21 @@ flowchart LR
   subgraph Device["User's browser (trusted)"]
     UI[React UI] --> Core[Stego core + Web Crypto]
   end
-  subgraph Host["Hostinger Node.js app"]
+  subgraph Host["Hostinger Business"]
     Static[Static pages]
     Proxy["/api/favicon"]
+    Stats["/api/stats"]
+    DB[("MySQL (localhost)")]
+    Proxy & Stats --> DB
   end
   Internet[(Public websites)]
   UI -- "HTML, JS (no user data)" --> Static
   UI -- "site address only" --> Proxy
+  UI -- "event name only" --> Stats
   Proxy -- "GET favicon" --> Internet
 ```
 
-Images, messages and passphrases stay inside the browser. The only user input that reaches the server is a website address for the favicon reader.
+Images, messages and passphrases stay inside the browser. The only user input that reaches the server is a website address for the favicon reader and the name of an event (`hide` or `reveal`) for the counters. The database is reachable only from the app on `localhost`.
 
 ## Adversaries
 
@@ -36,6 +41,7 @@ Images, messages and passphrases stay inside the browser. The only user input th
 2. **Active tamperer** modifies the image in transit.
 3. **Malicious visitor** abuses the favicon proxy to reach internal services or to exhaust resources.
 4. **Malicious website** returns hostile responses to the favicon proxy.
+5. **Data thief** obtains a copy of the database (a leaked backup or compromised credentials).
 
 ## STRIDE
 
@@ -47,10 +53,14 @@ Images, messages and passphrases stay inside the browser. The only user input th
 | **Tampering** with the message | Attacker flips bits so the reveal shows altered text. | GCM authentication tag; any change fails closed with "no message found". | Unencrypted mode has no integrity protection, by design. |
 | **Spoofing** the sender | Attacker hides their own message in an image. | Only someone with the passphrase can create a message that decrypts with it. | Anyone can create unencrypted messages. There are no signatures. |
 | **Server-side request forgery** | `?site=169.254.169.254`, `localhost`, decimal IPs, IPv6-mapped IPv4, DNS names resolving to private ranges, redirects into private ranges, DNS rebinding. | Scheme and port allow-list; credentials refused; literal IPs checked; DNS checked inside the socket's `lookup` so the validated address is the connected one; every redirect re-validated; at most 3 redirects. | New private ranges or IPv6 transition mechanisms not on the block list. The list is unit tested and easy to extend. |
-| **Denial of service** via the proxy | Many lookups, huge responses, slow-loris servers. | Per-IP rate limit (20 per minute); 512 KB page and 1 MB icon caps enforced while streaming; 5 s timeouts; at most 4 icon candidates. | The rate limiter is in-memory for a single instance. A distributed attacker could still consume the plan's CPU allowance. |
+| **Denial of service** via the proxy | Many lookups, huge responses, slow-loris servers. | Per-IP rate limit (20 per minute) stored in MySQL so it survives restarts; 24-hour icon cache; 512 KB page and 1 MB icon caps enforced while streaming; 5 s timeouts; at most 4 icon candidates. | A distributed attacker using many addresses could still consume the plan's CPU allowance. |
+| **Information disclosure** from the database | A leaked backup reveals who used the site and for what. | Nothing personal is stored: rate-limit keys are HMAC-SHA256 of the address with a secret held only in an environment variable; counters are bare numbers; the cache holds public icons. | Cached host names show which public sites were looked up in the last day, without saying by whom. |
+| **Tampering** with the database | SQL injection through the site address or event name. | Every query is parameterised; event names are checked against an allow-list; host names come from the URL parser. | None known. |
+| **Denial of service** via the database | Flooding `/api/stats` to inflate counters or fill tables. | Stats posts are rate limited (30 per minute); `rate_limits` rows are swept; the cache is keyed by host name and capped at 1 MB per icon; the pool is limited to 5 connections. | Counters are vanity numbers; a determined attacker with many addresses can inflate them. |
+| **Elevation of privilege** via credentials | Credentials committed to the repository. | Credentials are read from Hostinger's environment variables only; `.env*` is git-ignored; the database user needs rights on its own database only. | A compromised Hostinger account exposes them. Mitigated by account security and two-factor login. |
 | **Malicious content** from a website | Proxy returns HTML or SVG with script as an "icon". | Magic-byte sniffing allows only PNG, ICO, GIF, JPEG, WebP and BMP; SVG is never fetched or returned; responses carry `nosniff` and `Content-Security-Policy: default-src 'none'`. | Browser image decoder bugs. Mitigated by keeping browsers updated. |
 | **Elevation of privilege** in the page | XSS through a revealed message. | Messages are rendered as React text, never HTML; strict CSP with `object-src 'none'` and `base-uri 'none'`. | `script-src 'unsafe-inline'` is required by Next.js's inline bootstrap. A nonce-based CSP would remove it at the cost of dynamic rendering. |
-| **Repudiation** | Not applicable: the app has no accounts or server-side actions on user data. | | |
+| **Repudiation** | Not applicable: the app has no accounts and stores no actions tied to a person. | | |
 
 ## Known limitations
 
