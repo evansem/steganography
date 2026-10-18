@@ -19,6 +19,6 @@ Add `GET /api/favicon?site=…`, which fetches the icon server-side and returns 
 
 ## Consequences
 
-- The app needs a Node runtime rather than a pure static export. Hostinger Business supports Node.js apps.
+- The app needs a Node runtime rather than a pure static export.
 - The proxy sees which sites a visitor looks up, but never their images.
-- The in-memory rate limiter does not coordinate across instances. Hostinger runs one instance per app, so this is acceptable.
+- The in-memory rate limiter does not coordinate across instances. The app is designed to run as a single instance, so this is acceptable.

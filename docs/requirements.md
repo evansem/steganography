@@ -1,6 +1,6 @@
 # Justeg requirements
 
-Justeg hides text inside images using least-significant-bit (LSB) steganography. Version 2 rebuilds the 2022 Python/Tkinter prototype as a web app that runs on Hostinger Business web hosting.
+Justeg hides text inside images using least-significant-bit (LSB) steganography. Version 2 rebuilds the 2022 Python/Tkinter prototype as a web app that runs on ordinary Node.js hosting.
 
 This document states what the app must do (functional requirements), how well it must do it (non-functional requirements), and what is deliberately out of scope. Each requirement has an ID so code, tests and pull requests can refer to it.
 
@@ -96,7 +96,7 @@ This document states what the app must do (functional requirements), how well it
 
 | ID | Requirement |
 |---|---|
-| NFR-O1 | The app deploys to Hostinger Business web hosting as a Node.js web app built with `npm run build` and run with `npm start`. |
+| NFR-O1 | The app deploys to any standard Node.js host as a single, stateless web app built with `npm run build` and run with `npm start`. |
 | NFR-O2 | The app runs on Node.js 20.9 or later. |
 
 ## Out of scope

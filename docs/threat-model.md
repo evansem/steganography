@@ -18,7 +18,7 @@ flowchart LR
   subgraph Device["User's browser (trusted)"]
     UI[React UI] --> Core[Stego core + Web Crypto]
   end
-  subgraph Host["Hostinger Node.js app"]
+  subgraph Host["Node.js app"]
     Static[Static pages]
     Proxy["/api/favicon"]
   end
@@ -43,7 +43,7 @@ Images, messages and passphrases stay inside the browser. The only user input th
 |---|---|---|---|
 | **Information disclosure** of the message | Observer runs an LSB extractor on the image. | AES-256-GCM encryption with a PBKDF2-derived key; bits scattered by a keyed permutation; no magic number in encrypted mode. | Weak passphrases can be brute-forced offline. 600k PBKDF2 iterations slow this, and the UI encourages long passphrases. |
 | **Information disclosure** of the message's existence | Steganalysis (chi-square, RS analysis, bit-plane inspection). | Scattering removes the obvious "band at the top"; 1-bit mode changes about half the touched channels by ±1. | Statistical tests can still flag that LSBs were edited. Justeg is not undetectable and says so. |
-| **Information disclosure** of images | A server log or analytics script sees a photo. | All processing is client-side; no third-party scripts or fonts; CSP `connect-src 'self'`. | A compromised hosting account could ship malicious JavaScript. Out of scope for the app; mitigated by Hostinger account security. |
+| **Information disclosure** of images | A server log or analytics script sees a photo. | All processing is client-side; no third-party scripts or fonts; CSP `connect-src 'self'`. | A compromised hosting account could ship malicious JavaScript. Out of scope for the app; mitigated by hosting account security. |
 | **Tampering** with the message | Attacker flips bits so the reveal shows altered text. | GCM authentication tag; any change fails closed with "no message found". | Unencrypted mode has no integrity protection, by design. |
 | **Spoofing** the sender | Attacker hides their own message in an image. | Only someone with the passphrase can create a message that decrypts with it. | Anyone can create unencrypted messages. There are no signatures. |
 | **Server-side request forgery** | `?site=169.254.169.254`, `localhost`, decimal IPs, IPv6-mapped IPv4, DNS names resolving to private ranges, redirects into private ranges, DNS rebinding. | Scheme and port allow-list; credentials refused; literal IPs checked; DNS checked inside the socket's `lookup` so the validated address is the connected one; every redirect re-validated; at most 3 redirects. | New private ranges or IPv6 transition mechanisms not on the block list. The list is unit tested and easy to extend. |
