@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { decodeImage, encodePng, type LoadedImage } from "@/lib/image";
 import { formatBytes, friendlyError } from "@/lib/messages";
+import { recordUsage } from "@/lib/usage";
 import { hide, plainCapacity, sealedCapacity, type BitDepth } from "@/lib/stego";
 import styles from "./Controls.module.css";
 import { DropZone } from "./DropZone";
@@ -71,6 +72,7 @@ export function HidePanel() {
       if (output) URL.revokeObjectURL(output.url);
       setOutput({ inputs, pixels, url: URL.createObjectURL(blob), size: blob.size });
       setStatus({ tone: "success", text: "Done. The message is inside. Download the PNG below." });
+      recordUsage("hide");
     } catch (error) {
       setStatus({ tone: "error", text: friendlyError(error) });
     } finally {

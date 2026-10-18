@@ -14,12 +14,15 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
-    "icon": "tsx scripts/make-egg-icon.ts"
+    "icon": "tsx scripts/make-egg-icon.ts",
+    "db:schema": "tsx scripts/db.ts schema",
+    "db:migrate": "tsx scripts/db.ts migrate"
   },
   "dependencies": {
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/space-grotesk": "^5.3.0",
     "@fontsource/instrument-serif": "^5.3.0",
+    "mysql2": "^3.24.6",
     "next": "16.4.2",
     "react": "19.3.1",
     "react-dom": "19.3.1"

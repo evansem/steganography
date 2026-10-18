@@ -4,6 +4,7 @@ import { useState } from "react";
 import { decodeImage, type LoadedImage } from "@/lib/image";
 import { friendlyError } from "@/lib/messages";
 import { reveal, type Revealed } from "@/lib/stego";
+import { recordUsage } from "@/lib/usage";
 import styles from "./Controls.module.css";
 import { DevelopingText } from "./DevelopingText";
 import { DropZone } from "./DropZone";
@@ -44,6 +45,7 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
       const revealed = await reveal(image, passphrase || undefined);
       setFound(revealed);
       setStatus({ tone: "success", text: "Message recovered." });
+      recordUsage("reveal");
     } catch (error) {
       setStatus({
         tone: "error",

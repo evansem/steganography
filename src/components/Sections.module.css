@@ -184,3 +184,12 @@
 .footer p {
   margin: 0;
 }
+
+.ticker {
+  font-family: var(--font-mono);
+  font-size: 13px;
+}
+
+.ticker span {
+  color: var(--glow);
+}

@@ -17,6 +17,21 @@ jobs:
     name: Lint, type-check, test, build
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    services:
+      # Shared hosting runs MySQL-compatible MariaDB; the store tests run against it.
+      db:
+        image: mariadb:10.11
+        env:
+          MARIADB_DATABASE: justeg_test
+          MARIADB_USER: justeg
+          MARIADB_PASSWORD: justeg
+          MARIADB_RANDOM_ROOT_PASSWORD: "1"
+        ports: ["3306:3306"]
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=5s --health-timeout=5s --health-retries=20
+    env:
+      TEST_DATABASE_URL: mysql://justeg:justeg@127.0.0.1:3306/justeg_test
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v4

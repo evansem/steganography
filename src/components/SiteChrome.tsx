@@ -1,4 +1,5 @@
 import styles from "./Sections.module.css";
+import { StatsTicker } from "./StatsTicker";
 
 const REPO = "https://github.com/evansem/steganography";
 
@@ -38,6 +39,7 @@ export function Footer() {
         Justeg · just a simple <strong>steg</strong>anography tool, first written in Python in 2022 and rebuilt
         for the web.
       </p>
+      <StatsTicker />
       <p>
         <a href={REPO} target="_blank" rel="noreferrer">
           Source &amp; design docs ↗
