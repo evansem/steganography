@@ -12,23 +12,25 @@
 }
 
 .views {
+  composes: chamfer from "./Edges.module.css";
+  --c: 10px;
+  --edge: var(--line);
+  --fill: var(--ink-3);
   display: inline-flex;
   padding: 4px;
   gap: 4px;
-  border-radius: 999px;
-  background: var(--ink-3);
-  border: 1px solid var(--line);
 }
 
 .view {
+  composes: chamfer from "./Edges.module.css";
+  --c: 7px;
+  --edge: transparent;
+  --fill: transparent;
   padding: 6px 14px;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
   font-size: 13px;
   color: var(--muted);
   cursor: pointer;
-  transition: background-color 0.2s var(--ease), color 0.2s var(--ease);
+  transition: color 0.2s var(--ease);
 }
 
 .view:hover:not(:disabled):not([aria-pressed="true"]) {
@@ -36,8 +38,13 @@
 }
 
 .view[aria-pressed="true"] {
-  background: var(--paper);
+  --edge: var(--paper);
+  --fill: var(--paper);
   color: var(--ink);
+}
+
+.view[aria-pressed="true"]:focus-visible {
+  outline-color: var(--ink);
 }
 
 .view:disabled {
@@ -46,32 +53,33 @@
 }
 
 .clear {
+  composes: chamfer from "./Edges.module.css";
+  --c: 8px;
+  --fill: var(--ink-2);
   width: 32px;
   height: 32px;
-  border-radius: 50%;
-  border: 1px solid var(--line-strong);
-  background: transparent;
+  padding: 0;
   font-size: 18px;
   line-height: 1;
   cursor: pointer;
 }
 
 .clear:hover {
-  border-color: var(--danger);
+  --edge: var(--danger);
   color: var(--danger);
 }
 
 .frame {
+  composes: chamfer from "./Edges.module.css";
+  --c: var(--cut);
+  --edge: var(--line);
+  --fill-image: repeating-conic-gradient(var(--ink-3) 0 25%, var(--ink-2) 0 50%) 0 0 / 20px 20px;
   position: relative;
   display: grid;
   place-items: center;
   min-height: 280px;
   max-height: 520px;
   overflow: hidden;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background:
-    repeating-conic-gradient(var(--ink-3) 0 25%, var(--ink-2) 0 50%) 0 0 / 20px 20px;
 }
 
 .img {
@@ -91,13 +99,14 @@
 }
 
 .forensic {
-  box-shadow: inset 0 0 0 1px rgb(212 255 58 / 0.3), 0 0 60px rgb(212 255 58 / 0.08);
+  --edge: rgb(var(--glow-rgb) / 0.45);
+  box-shadow: inset 0 0 60px rgb(var(--glow-rgb) / 0.06);
 }
 
 .scan {
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, transparent 0 46%, rgb(139 92 255 / 0.22) 50%, transparent 54%);
+  background: linear-gradient(180deg, transparent 0 46%, rgb(var(--uv-rgb) / 0.18) 50%, transparent 54%);
   background-size: 100% 220%;
   animation: scan 3.6s linear infinite;
   opacity: 0;

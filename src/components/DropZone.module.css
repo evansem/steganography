@@ -1,5 +1,6 @@
 .zone {
-  position: relative;
+  composes: brackets from "./Edges.module.css";
+  --tick: var(--uv);
   display: grid;
   place-items: center;
   align-content: center;
@@ -8,18 +9,21 @@
   padding: 32px 20px;
   text-align: center;
   border: 1.5px dashed var(--line-strong);
-  border-radius: var(--radius);
-  background:
-    linear-gradient(var(--ink-2), var(--ink-2)) padding-box,
-    repeating-linear-gradient(45deg, transparent 0 10px, rgb(139 92 255 / 0.03) 10px 20px);
+  background-color: var(--ink-2);
   cursor: pointer;
   transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease), transform 0.2s var(--ease);
 }
 
 .zone:hover,
 .over {
+  --tick: var(--glow);
   border-color: var(--uv);
-  background-color: var(--uv-soft);
+  background-color: color-mix(in srgb, var(--uv) 10%, var(--ink-2));
+}
+
+/* the viewfinder ticks reach in as a file is dragged over */
+.over::after {
+  --_l: 32px;
 }
 
 .over {
@@ -36,10 +40,10 @@
   place-items: center;
   width: 56px;
   height: 56px;
-  border-radius: 50%;
   color: var(--uv-bright);
   background: var(--uv-soft);
-  box-shadow: 0 0 40px rgb(139 92 255 / 0.35);
+  /* octagon */
+  clip-path: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%);
 }
 
 .label {

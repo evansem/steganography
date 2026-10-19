@@ -15,7 +15,7 @@
 .title em {
   font-style: italic;
   color: var(--glow);
-  text-shadow: 0 0 40px rgb(212 255 58 / 0.35);
+  text-shadow: 0 0 48px rgb(var(--glow-rgb) / 0.25);
 }
 
 .copy {

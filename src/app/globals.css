@@ -1,7 +1,17 @@
 /* ==========================================================================
-   Justeg design tokens. The look is "blacklight": ink-dark surfaces, UV
-   violet light, and fluorescent ink that only shows where the light falls.
+   Justeg design tokens. The look is "blacklight": ink-dark surfaces, soft
+   lavender light, and pale mint ink that only shows where the light falls.
+   Corners are cut, never rounded: see components/Edges.module.css.
    ========================================================================== */
+
+/* Edge knobs for components/Edges.module.css. Non-inherited, so each element
+   only gets the edge it asks for. */
+@property --c { syntax: "*"; inherits: false; }
+@property --edge { syntax: "*"; inherits: false; }
+@property --edge-end { syntax: "*"; inherits: false; }
+@property --edge-image { syntax: "*"; inherits: false; }
+@property --fill { syntax: "*"; inherits: false; }
+@property --fill-image { syntax: "*"; inherits: false; }
 
 :root {
   color-scheme: dark;
@@ -15,19 +25,25 @@
   --muted: #9d96b4;
   --faint: #6c6684;
 
-  --uv: #8b5cff;
-  --uv-bright: #b197ff;
-  --uv-soft: rgb(139 92 255 / 0.16);
-  --glow: #d4ff3a;
-  --glow-soft: rgb(212 255 58 / 0.14);
-  --danger: #ff6b86;
+  /* Accents are pastel. The *-rgb channels feed translucent tints. */
+  --uv-rgb: 184 164 255;
+  --glow-rgb: 178 240 206;
+  --danger-rgb: 255 177 192;
+  --uv: rgb(var(--uv-rgb));
+  --uv-bright: #d9cfff;
+  --uv-soft: rgb(var(--uv-rgb) / 0.14);
+  --glow: rgb(var(--glow-rgb));
+  --glow-soft: rgb(var(--glow-rgb) / 0.12);
+  --danger: rgb(var(--danger-rgb));
 
   --font-display: "Instrument Serif", ui-serif, Georgia, serif;
   --font-ui: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
 
-  --radius: 18px;
-  --radius-sm: 10px;
+  /* corner cut sizes */
+  --cut: 18px;
+  --cut-sm: 9px;
+  --pixel: 3px;
   --gutter: clamp(16px, 4vw, 48px);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
@@ -71,7 +87,6 @@ a {
 :focus-visible {
   outline: 2px solid var(--glow);
   outline-offset: 3px;
-  border-radius: 6px;
 }
 
 button,

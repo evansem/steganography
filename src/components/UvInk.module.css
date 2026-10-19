@@ -8,7 +8,7 @@
   align-items: center;
   font-family: var(--font-mono);
   color: var(--glow);
-  text-shadow: 0 0 12px rgb(212 255 58 / 0.6);
+  text-shadow: 0 0 12px rgb(var(--glow-rgb) / 0.45);
   background: var(--ink);
   pointer-events: none;
   -webkit-mask-image: radial-gradient(120px circle at var(--lx) var(--ly), #000 35%, transparent 78%);
