@@ -1,46 +1,81 @@
 /* ==========================================================================
-   Edge treatments. Justeg never rounds a corner; it uses three edges:
+   Edge treatments. Justeg never rounds a corner. Edges are made of pixels:
 
-   .chamfer   surfaces and controls: top-left and bottom-right corners cut
-              at 45deg, with the border carried along the cut.
-   .pixel     small chips (bits, badges, switches): corners stepped out one
-              "pixel", a nod to the pixels the message hides in.
+   .dissolve  surfaces and controls: the edge breaks up into an ordered
+              dither (25% -> 50% -> 75% -> solid), so a panel fades into
+              the page one pixel cell at a time, like a low-bit image.
+   .pixel     small chips (bits, badges): corners stepped out one pixel.
    .brackets  anything that frames an image: viewfinder ticks on the corners.
 
-   Compose them from a component module (`composes: chamfer from "./Edges.module.css"`)
-   and tune with the custom properties below. --c, --edge, --edge-end,
-   --edge-image, --fill and --fill-image are registered as non-inherited in
-   globals.css, so a chamfered control inside a chamfered card does not pick
-   up the card's colours.
+   Compose them from a component module (`composes: dissolve from "./Edges.module.css"`)
+   and tune with the custom properties below. --p, --edge, --edge-image,
+   --fill and --fill-image are registered as non-inherited in globals.css,
+   so a dithered control inside a dithered card does not pick up the
+   card's settings.
    ========================================================================== */
 
-.chamfer {
-  --_c: var(--c, var(--cut-sm));
+/*
+ * --p      size of one dither cell (default --dither)
+ * --edge   colour of the two outer bands, the "glow" pixels
+ * --fill   colour of the surface; --fill-image / --edge-image take images
+ *
+ * The mask is built bottom-up with mask-composite. With R(k) a rectangle
+ * inset by k cells and P(n) an n% ordered-dither tile:
+ *   R3, + P75, n R2, + P50, n R1, + P25
+ * which leaves 25% coverage in the outer band, 50% in the next, 75% in the
+ * third and solid inside. The patterns are nested (P25 in P50 in P75) and
+ * share one origin, so the bands line up cell for cell.
+ */
+.dissolve {
+  --_p: var(--p, var(--dither));
+  --_t: calc(var(--_p) * 2);
   --_e: var(--edge, var(--line-strong));
-  --_e2: var(--edge-end, var(--_e));
   --_f: var(--fill, var(--ink));
 
-  border: 1px solid transparent;
+  border: 0;
   background:
-    linear-gradient(135deg, transparent 50%, var(--_e) 50% calc(50% + 1px), transparent calc(50% + 1px))
-      0 0 / var(--_c) var(--_c) no-repeat border-box,
-    linear-gradient(135deg, transparent calc(50% - 1px), var(--_e2) calc(50% - 1px) 50%, transparent 50%)
-      100% 100% / var(--_c) var(--_c) no-repeat border-box,
-    var(--fill-image, linear-gradient(var(--_f) 0 0)) padding-box,
-    var(--edge-image, linear-gradient(var(--_e) 0 0)) border-box;
-  clip-path: polygon(
-    var(--_c) 0,
-    100% 0,
-    100% calc(100% - var(--_c)),
-    calc(100% - var(--_c)) 100%,
-    0 100%,
-    0 var(--_c)
-  );
+    var(--fill-image, linear-gradient(var(--_f) 0 0))
+      center / calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)) no-repeat,
+    var(--edge-image, linear-gradient(var(--_e) 0 0));
+  -webkit-mask-image:
+    conic-gradient(#000 0 25%, transparent 0),
+    linear-gradient(#000 0 0),
+    repeating-conic-gradient(#000 0 25%, transparent 0 50%),
+    linear-gradient(#000 0 0),
+    conic-gradient(#000 0 75%, transparent 0),
+    linear-gradient(#000 0 0);
+  mask-image:
+    conic-gradient(#000 0 25%, transparent 0),
+    linear-gradient(#000 0 0),
+    repeating-conic-gradient(#000 0 25%, transparent 0 50%),
+    linear-gradient(#000 0 0),
+    conic-gradient(#000 0 75%, transparent 0),
+    linear-gradient(#000 0 0);
+  -webkit-mask-size:
+    var(--_t) var(--_t),
+    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    var(--_t) var(--_t),
+    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    var(--_t) var(--_t),
+    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p));
+  mask-size:
+    var(--_t) var(--_t),
+    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    var(--_t) var(--_t),
+    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    var(--_t) var(--_t),
+    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p));
+  -webkit-mask-position: 0 0, center, 0 0, center, 0 0, center;
+  mask-position: 0 0, center, 0 0, center, 0 0, center;
+  -webkit-mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
+  mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
+  -webkit-mask-composite: source-over, source-in, source-over, source-in, source-over, source-over;
+  mask-composite: add, intersect, add, intersect, add, add;
 }
 
-/* clip-path would cut an outside focus ring, so draw it inside the edge */
-.chamfer:focus-visible {
-  outline-offset: -5px;
+/* the mask would hide an outside focus ring, so draw it on the solid core */
+.dissolve:focus-visible {
+  outline-offset: calc(-3 * var(--_p) - 3px);
 }
 
 .pixel {

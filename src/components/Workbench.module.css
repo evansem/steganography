@@ -35,12 +35,11 @@
   50% { opacity: 0.35; }
 }
 
-/* The cut corners carry the edge gradient: lavender in, mint out. */
+/* The dithered edge carries a gradient: lavender in, mint out. */
 .card {
-  composes: chamfer from "./Edges.module.css";
-  --c: 28px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 4px;
   --edge: rgb(var(--uv-rgb) / 0.6);
-  --edge-end: rgb(var(--glow-rgb) / 0.45);
   --edge-image: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.6), var(--line-strong) 35%, var(--line-strong) 65%, rgb(var(--glow-rgb) / 0.45));
   --fill-image: linear-gradient(180deg, var(--ink-3), var(--ink-2));
   position: relative;

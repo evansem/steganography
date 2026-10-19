@@ -113,16 +113,16 @@
 }
 
 .step {
-  composes: chamfer from "./Edges.module.css";
+  composes: dissolve from "./Edges.module.css";
 }
 
 .tile {
-  composes: chamfer from "./Edges.module.css";
+  composes: dissolve from "./Edges.module.css";
 }
 
 .step,
 .tile {
-  --c: var(--cut);
+  --p: var(--dither-lg);
   --edge: var(--line);
   --fill: var(--ink-2);
   padding: 24px;

@@ -43,25 +43,25 @@
 }
 
 .input {
-  composes: chamfer from "./Edges.module.css";
+  composes: dissolve from "./Edges.module.css";
 }
 
 .textarea {
-  composes: chamfer from "./Edges.module.css";
+  composes: dissolve from "./Edges.module.css";
 }
 
 .input,
 .textarea {
   width: 100%;
-  padding: 12px 14px;
-  transition: box-shadow 0.2s var(--ease);
+  padding: 14px 16px;
 }
 
+/* the edge pixels light up, and a ring is drawn on the solid core */
 .input:focus,
 .textarea:focus {
-  outline: none;
   --edge: var(--uv);
-  box-shadow: inset 0 0 0 1px var(--uv);
+  outline: 1px solid var(--uv);
+  outline-offset: -10px;
 }
 
 .textarea {
@@ -78,8 +78,8 @@
 }
 
 .segmented {
-  composes: chamfer from "./Edges.module.css";
-  --c: 13px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 2px;
   --edge: var(--line);
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -88,8 +88,8 @@
 }
 
 .segment {
-  composes: chamfer from "./Edges.module.css";
-  --c: 8px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 2px;
   --edge: transparent;
   --fill: transparent;
   display: grid;
@@ -110,7 +110,7 @@
 }
 
 .switch {
-  composes: chamfer from "./Edges.module.css";
+  composes: dissolve from "./Edges.module.css";
   --edge: var(--line);
   display: flex;
   align-items: center;
@@ -120,7 +120,7 @@
   cursor: pointer;
 }
 
-/* square track and thumb: the switch is the one control with no cut */
+/* square track and thumb: the switch is the one control with a hard edge */
 .switch input {
   appearance: none;
   flex: none;
@@ -206,8 +206,8 @@
 }
 
 .primary {
-  composes: chamfer from "./Edges.module.css";
-  --c: 12px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 3px;
   --edge: var(--glow);
   --fill: var(--glow);
   color: var(--ink);
@@ -224,8 +224,8 @@
 }
 
 .secondary {
-  composes: chamfer from "./Edges.module.css";
-  --c: 12px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 3px;
   --fill: var(--ink-2);
 }
 
@@ -269,8 +269,8 @@
 }
 
 .output {
-  composes: chamfer from "./Edges.module.css";
-  --c: var(--cut);
+  composes: dissolve from "./Edges.module.css";
+  --p: var(--dither-lg);
   --edge: rgb(var(--glow-rgb) / 0.4);
   --fill-image: radial-gradient(400px circle at 0 0, var(--glow-soft), transparent 70%), linear-gradient(var(--ink) 0 0);
   position: relative;
