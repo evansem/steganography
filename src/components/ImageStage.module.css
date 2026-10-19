@@ -12,8 +12,8 @@
 }
 
 .views {
-  composes: chamfer from "./Edges.module.css";
-  --c: 10px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 2px;
   --edge: var(--line);
   --fill: var(--ink-3);
   display: inline-flex;
@@ -22,8 +22,8 @@
 }
 
 .view {
-  composes: chamfer from "./Edges.module.css";
-  --c: 7px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 2px;
   --edge: transparent;
   --fill: transparent;
   padding: 6px 14px;
@@ -53,8 +53,8 @@
 }
 
 .clear {
-  composes: chamfer from "./Edges.module.css";
-  --c: 8px;
+  composes: dissolve from "./Edges.module.css";
+  --p: 2px;
   --fill: var(--ink-2);
   width: 32px;
   height: 32px;
@@ -70,8 +70,8 @@
 }
 
 .frame {
-  composes: chamfer from "./Edges.module.css";
-  --c: var(--cut);
+  composes: dissolve from "./Edges.module.css";
+  --p: var(--dither-lg);
   --edge: var(--line);
   --fill-image: repeating-conic-gradient(var(--ink-3) 0 25%, var(--ink-2) 0 50%) 0 0 / 20px 20px;
   position: relative;
