@@ -27,7 +27,9 @@ flowchart TB
 | Module | Responsibility | Depends on |
 |---|---|---|
 | `src/lib/stego` | Bit packing, slot orders, plain and sealed containers, the public `hide` / `reveal` / `capacity` API. | Web Crypto only. No DOM, no React. |
-| `src/lib/image.ts` | Turns files into RGBA pixels and back into PNG, with colour-space conversion off; forensic views. | Canvas, `createImageBitmap`. |
+| `src/lib/image.ts` | Turns files into RGBA pixels and back into PNG or PPM, with colour-space conversion off; forensic views. | Canvas, `createImageBitmap`, `lib/netpbm`. |
+| `src/lib/netpbm.ts` | Netpbm (P1–P6) reader and binary PPM writer, since browsers cannot decode the format. | Nothing. |
+| `src/lib/colour.ts` | sRGB to CIELAB and ΔE, used by the "How it works" diagrams. | Nothing. |
 | `src/lib/favicon` | Server-only: parse the site input, discover icon links, fetch safely, sniff formats, rate limit. | `node:http(s)`, `node:dns`. |
 | `src/components` | React UI. Each panel owns its state; shared controls are CSS modules. | `lib/*`. |
 | `src/app` | Next.js routes, layout, global design tokens, icon. | Everything above. |
@@ -61,6 +63,14 @@ scattered:   length u32 | IV (12) | AES-GCM ciphertext + tag (16)
 ```
 
 PBKDF2-SHA256 (600,000 iterations) turns passphrase + salt into 512 bits: 256 for the AES key and 256 for the scatter key. The bit depth is bound to the ciphertext as additional authenticated data. The reader tries both depths; for each it reads the salt, derives keys, follows the scatter order and attempts decryption. GCM's tag check means the first success is certain, and every failure is reported the same way.
+
+Legacy, read only (FR-16, [ADR 0005](adr/0005-netpbm-and-legacy-reader.md)):
+
+```
+sequential, 2 bits per slot:  7-bit ASCII ... | EOT (0000100 or 00000100)
+```
+
+Tried only for Netpbm images without a passphrase, after the plain container is not found. It has no signature, so it accepts only non-empty printable text that ends in the terminator.
 
 ### Why output is opaque
 
@@ -120,7 +130,7 @@ sequenceDiagram
 
 | Layer | Tool | What is covered |
 |---|---|---|
-| Core | Vitest (Node) | Bit packing, permutation properties, plain and sealed round trips, capacity edges, wrong passphrase, tampering, randomness of output. |
+| Core | Vitest (Node) | Bit packing, permutation properties, plain and sealed round trips, capacity edges, wrong passphrase, tampering, randomness of output, Netpbm variants, the prototype's sample images, colour difference maths. |
 | Favicon server | Vitest (Node) | Blocked address ranges, URL policy, DNS guard, link discovery and ranking, magic-byte sniffing. |
 | UI | Manual and Playwright smoke run | Hide → download → reveal; wrong passphrase; favicon Easter egg; mobile width. |
 

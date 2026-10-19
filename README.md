@@ -8,10 +8,11 @@ The name comes from the idea behind it: **ju**st a simple **steg**anography tool
 
 ## What it does
 
-- **Hide** any Unicode message in a PNG, JPEG, WebP, GIF, BMP or ICO and download the result as a lossless PNG.
+- **Hide** any Unicode message in a PNG, JPEG, WebP, GIF, BMP, ICO or Netpbm (PBM/PGM/PPM) image and download the result as a lossless PNG, or as PPM for Netpbm covers.
 - **Encrypt** with a passphrase: AES-256-GCM, a PBKDF2-SHA256 key (600k iterations), and bits scattered across the image by a keyed permutation. Without the passphrase there is nothing to find.
 - **Reveal** messages, with automatic detection of 1- or 2-bit depth and tamper detection.
 - **Inspect** any image's lowest bit plane, and after hiding, see a map of every channel that changed.
+- **Read 2022 messages** from the original prototype's PBM images.
 - **Read favicons** from any website. Try Justeg's own icon: there is an egg in it.
 
 | Hide, then inspect the changes | Read a favicon |
@@ -22,6 +23,7 @@ The name comes from the idea behind it: **ju**st a simple **steg**anography tool
 
 | | |
 |---|---|
+| [How it works](docs/how-it-works.md) | LSB steganography from the pixel up, with diagrams and a worked example |
 | [Requirements](docs/requirements.md) | Functional and non-functional requirements with IDs |
 | [Architecture](docs/architecture.md) | Modules, data formats, flows and test strategy |
 | [Threat model](docs/threat-model.md) | STRIDE analysis and honest limits |
@@ -46,7 +48,7 @@ LSB steganography does not survive lossy recompression. Re-saving as JPEG, resiz
 
 ## History
 
-Justeg started in 2022 as a Python/Tkinter desktop app that hid 7-bit ASCII in PBM images with an end-of-transmission marker. That version lives in [`legacy/python`](legacy/python). Version 2 keeps the idea and fixes its weaknesses: no encryption, a predictable marker, sequential embedding and ASCII-only text.
+Justeg started in 2022 as a Python/Tkinter desktop app that hid 7-bit ASCII in PBM images with an end-of-transmission marker. That version lives in [`legacy/python`](legacy/python). Version 2 keeps the idea and fixes its weaknesses: no encryption, a predictable marker, sequential embedding and ASCII-only text. It still opens the prototype's PBM files and reads the messages hidden in its samples.
 
 <details>
 <summary>Screenshots of the 2022 version</summary>
