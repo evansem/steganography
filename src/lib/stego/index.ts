@@ -1,5 +1,6 @@
 export * from "./api";
 export * from "./errors";
+export * from "./legacy";
 export * from "./lsb";
 export * from "./order";
 export * from "./plain";

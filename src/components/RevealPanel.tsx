@@ -41,7 +41,7 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
     setFound(null);
     setStatus({ tone: "idle", text: passphrase ? "Deriving key and searching…" : "Reading the lowest bits…" });
     try {
-      const revealed = await reveal(image, passphrase || undefined);
+      const revealed = await reveal(image, passphrase || undefined, { legacy: image.format === "netpbm" });
       setFound(revealed);
       setStatus({ tone: "success", text: "Message recovered." });
     } catch (error) {
@@ -112,6 +112,7 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
                 {found.encrypted ? "AES-GCM verified" : "Unencrypted"}
               </span>
               <span className={styles.badge}>{found.depth}-bit LSB</span>
+              {found.legacy && <span className={styles.badge}>2022 prototype format</span>}
             </div>
             <output className={styles.output} htmlFor="reveal-passphrase">
               {found.text ? <DevelopingText key={found.text} text={found.text} /> : <em>(empty message)</em>}

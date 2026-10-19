@@ -1,3 +1,4 @@
+import { encodePpm, isNetpbm, NetpbmError, parseNetpbm } from "@/lib/netpbm";
 import type { ImageLike } from "@/lib/stego";
 
 /** Hard limits keep memory bounded on phones (NFR-P2). */
@@ -13,15 +14,27 @@ export class ImageInputError extends Error {
 
 export interface LoadedImage extends ImageLike {
   name: string;
+  /** "netpbm" for PBM/PGM/PPM files, which the browser cannot decode itself. */
+  format: "netpbm" | "browser";
 }
 
 /**
- * Decodes any browser-supported image into raw RGBA pixels. Colour space
- * conversion is disabled so the stored bits are read back exactly.
+ * Decodes an image into raw RGBA pixels. Netpbm files are parsed in
+ * TypeScript; everything else goes through the browser's decoder with colour
+ * space conversion disabled so the stored bits are read back exactly.
  */
 export async function decodeImage(blob: Blob, name = "image"): Promise<LoadedImage> {
   if (blob.size > MAX_FILE_BYTES) {
     throw new ImageInputError(`That file is ${(blob.size / 1e6).toFixed(1)} MB. The limit is 25 MB.`);
+  }
+
+  const bytes = new Uint8Array(await blob.arrayBuffer());
+  if (isNetpbm(bytes)) {
+    try {
+      return { ...parseNetpbm(bytes, MAX_PIXELS), name, format: "netpbm" };
+    } catch (error) {
+      throw new ImageInputError(error instanceof NetpbmError ? error.message : "That Netpbm file could not be read.");
+    }
   }
   if (blob.type && !blob.type.startsWith("image/")) {
     throw new ImageInputError("That file is not an image.");
@@ -44,7 +57,7 @@ export async function decodeImage(blob: Blob, name = "image"): Promise<LoadedIma
   ctx.drawImage(bitmap, 0, 0);
   bitmap.close();
   const { data } = ctx.getImageData(0, 0, width, height);
-  return { data, width, height, name };
+  return { data, width, height, name, format: "browser" };
 }
 
 /** Encodes RGBA pixels as a lossless PNG. */
@@ -54,6 +67,11 @@ export async function encodePng(data: Uint8ClampedArray, width: number, height: 
   return new Promise((resolve, reject) =>
     ctx.canvas.toBlob((blob) => (blob ? resolve(blob) : reject(new Error("PNG encoding failed."))), "image/png"),
   );
+}
+
+/** Encodes RGBA pixels as a binary PPM (P6), readable by the 2022 prototype. */
+export function encodeNetpbm(data: Uint8ClampedArray, width: number, height: number): Blob {
+  return new Blob([encodePpm(data, width, height)], { type: "image/x-portable-pixmap" });
 }
 
 /** Renders pixels to an object URL for previews. Caller revokes it. */
