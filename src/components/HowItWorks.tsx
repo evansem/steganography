@@ -1,3 +1,8 @@
+import { BitFlip } from "./BitFlip";
+import { ContainerMap } from "./ContainerMap";
+import explainer from "./Explainer.module.css";
+import { Pipeline } from "./Pipeline";
+import { PixelZoom } from "./PixelZoom";
 import styles from "./Sections.module.css";
 
 const BYTE = ["1", "0", "1", "1", "0", "1", "1", "0"];
@@ -48,6 +53,26 @@ export function HowItWorks() {
           </li>
         ))}
       </ol>
+
+      <div className={explainer.figures}>
+        <h3 className={explainer.subhead}>Why nobody notices</h3>
+        <p className={explainer.intro}>
+          A channel&apos;s bits are not equal. The top bit is worth 128 steps of brightness, the bottom bit just one.
+          Changing the bottom bit moves the colour by less than 0.4%, well under the smallest difference human vision
+          can pick out, measured below as ΔE in the CIELAB colour space.
+        </p>
+        <BitFlip />
+        <PixelZoom />
+
+        <h3 className={explainer.subhead}>What happens when you press Hide</h3>
+        <Pipeline />
+        <ContainerMap />
+        <p className={explainer.intro}>
+          The change is invisible, not undetectable. Open the <a href="#lab">lab</a>, load an image and switch to{" "}
+          <strong>Bit plane</strong>: a plain message shows up as a band of noise along the top, while an encrypted one
+          is spread across the whole picture.
+        </p>
+      </div>
     </section>
   );
 }
