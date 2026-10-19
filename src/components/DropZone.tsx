@@ -1,6 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
+import { NETPBM_EXTENSIONS } from "@/lib/netpbm";
 import styles from "./DropZone.module.css";
 
 interface Props {
@@ -10,8 +11,11 @@ interface Props {
   disabled?: boolean;
 }
 
-/** Drag-and-drop or click/keyboard to pick a single image. */
-export function DropZone({ label, hint = "PNG, JPG, WebP, GIF or ICO · up to 25 MB", onFile, disabled }: Props) {
+/**
+ * Drag-and-drop or click/keyboard to pick a single image. Netpbm extensions
+ * are listed explicitly because most systems give them no image MIME type.
+ */
+export function DropZone({ label, hint = "PNG, JPG, WebP, GIF, ICO or PBM/PPM · up to 25 MB", onFile, disabled }: Props) {
   const id = useId();
   const [over, setOver] = useState(false);
 
@@ -34,7 +38,7 @@ export function DropZone({ label, hint = "PNG, JPG, WebP, GIF or ICO · up to 25
       <input
         id={id}
         type="file"
-        accept="image/*"
+        accept={["image/*", ...NETPBM_EXTENSIONS].join(",")}
         className="visually-hidden"
         disabled={disabled}
         onChange={(event) => {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { decodeImage, encodePng, type LoadedImage } from "@/lib/image";
+import { decodeImage, encodeNetpbm, encodePng, type LoadedImage } from "@/lib/image";
 import { formatBytes, friendlyError } from "@/lib/messages";
 import { hide, plainCapacity, sealedCapacity, type BitDepth } from "@/lib/stego";
 import styles from "./Controls.module.css";
@@ -23,6 +23,8 @@ interface Output {
   pixels: Uint8ClampedArray;
   url: string;
   size: number;
+  /** Netpbm copy, offered when the cover image was Netpbm. */
+  netpbm?: { url: string; size: number };
 }
 
 const sameInputs = (a: Inputs, b: Inputs) =>
@@ -68,9 +70,22 @@ export function HidePanel() {
     try {
       const pixels = await hide(image, text, { passphrase: encrypt ? passphrase : undefined, depth });
       const blob = await encodePng(pixels, image.width, image.height);
-      if (output) URL.revokeObjectURL(output.url);
-      setOutput({ inputs, pixels, url: URL.createObjectURL(blob), size: blob.size });
-      setStatus({ tone: "success", text: "Done. The message is inside. Download the PNG below." });
+      const pnm = image.format === "netpbm" ? encodeNetpbm(pixels, image.width, image.height) : null;
+      if (output) {
+        URL.revokeObjectURL(output.url);
+        if (output.netpbm) URL.revokeObjectURL(output.netpbm.url);
+      }
+      setOutput({
+        inputs,
+        pixels,
+        url: URL.createObjectURL(blob),
+        size: blob.size,
+        netpbm: pnm ? { url: URL.createObjectURL(pnm), size: pnm.size } : undefined,
+      });
+      setStatus({
+        tone: "success",
+        text: `Done. The message is inside. Download the ${pnm ? "PNG or Netpbm file" : "PNG"} below.`,
+      });
     } catch (error) {
       setStatus({ tone: "error", text: friendlyError(error) });
     } finally {
@@ -78,7 +93,11 @@ export function HidePanel() {
     }
   }
 
-  const downloadName = `${(image?.name ?? "image").replace(/\.[^.]+$/, "")}-justeg.png`;
+  const baseName = (image?.name ?? "image").replace(/\.[^.]+$/, "");
+  const downloadName = `${baseName}-justeg.png`;
+  // keep the source's own Netpbm extension, as the 2022 prototype did
+  const netpbmExtension = /\.(pbm|pgm|ppm|pnm)$/i.exec(image?.name ?? "")?.[0].toLowerCase() ?? ".ppm";
+  const netpbmName = `${baseName}-justeg${netpbmExtension}`;
 
   return (
     <div className={styles.panel}>
@@ -188,6 +207,11 @@ export function HidePanel() {
           {result && (
             <a className={styles.secondary} href={result.url} download={downloadName}>
               Download PNG · {formatBytes(result.size)}
+            </a>
+          )}
+          {result?.netpbm && (
+            <a className={styles.secondary} href={result.netpbm.url} download={netpbmName}>
+              Download {netpbmExtension.slice(1).toUpperCase()} · {formatBytes(result.netpbm.size)}
             </a>
           )}
         </div>

@@ -1,3 +1,5 @@
+import { NoMessageError } from "./errors";
+import { extractLegacy } from "./legacy";
 import type { BitDepth } from "./lsb";
 import { embedPlain, extractPlain, plainCapacity, type ImageLike } from "./plain";
 import { embedSealed, extractSealed, sealedCapacity } from "./sealed";
@@ -8,10 +10,17 @@ export interface HideOptions {
   depth?: BitDepth;
 }
 
+export interface RevealOptions {
+  /** Also look for a message written by the 2022 prototype. */
+  legacy?: boolean;
+}
+
 export interface Revealed {
   text: string;
   depth: BitDepth;
   encrypted: boolean;
+  /** True when the message was written by the 2022 prototype. */
+  legacy?: boolean;
 }
 
 export function capacity(image: ImageLike, options: HideOptions = {}): number {
@@ -26,7 +35,12 @@ export async function hide(image: ImageLike, text: string, options: HideOptions 
     : embedPlain(image, text, depth);
 }
 
-export async function reveal(image: ImageLike, passphrase?: string): Promise<Revealed> {
+export async function reveal(image: ImageLike, passphrase?: string, options: RevealOptions = {}): Promise<Revealed> {
   if (passphrase) return { ...(await extractSealed(image, passphrase)), encrypted: true };
-  return { ...extractPlain(image), encrypted: false };
+  try {
+    return { ...extractPlain(image), encrypted: false };
+  } catch (error) {
+    if (!options.legacy || !(error instanceof NoMessageError)) throw error;
+    return { ...extractLegacy(image), depth: 2, encrypted: false, legacy: true };
+  }
 }
