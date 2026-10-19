@@ -26,12 +26,12 @@ This document states what the app must do (functional requirements), how well it
 
 | ID | Requirement |
 |---|---|
-| FR-1 | The user can choose a cover image by file picker or drag and drop. Any format the browser can decode is accepted (PNG, JPEG, WebP, GIF, BMP, ICO). |
+| FR-1 | The user can choose a cover image by file picker or drag and drop. Any format the browser can decode is accepted (PNG, JPEG, WebP, GIF, BMP, ICO), plus Netpbm (PBM, PGM, PPM, PNM), which Justeg decodes itself. |
 | FR-2 | The user can type a message of any Unicode text, stored as UTF-8. |
 | FR-3 | The app shows, live, how many bytes the message uses and how many the image can hold with the current settings, and blocks hiding when it does not fit. |
 | FR-4 | The user can choose 1 bit per channel ("stealth") or 2 bits per channel ("capacity"). |
 | FR-5 | The user can optionally protect the message with a passphrase. Encryption is on by default. |
-| FR-6 | The result is offered as a lossless PNG download. |
+| FR-6 | The result is offered as a lossless PNG download. When the cover image is Netpbm, a binary PPM download is offered as well. |
 | FR-7 | After hiding, the user can compare the original and encoded images: the encoded image, its lowest bit plane, and a map of every changed channel with a count. |
 
 ### Revealing
@@ -51,6 +51,13 @@ This document states what the app must do (functional requirements), how well it
 | FR-13 | The user can enter a website address and the app fetches that site's favicon. |
 | FR-14 | The fetched icon opens in the reveal tool so it can be inspected and read like any other image. |
 | FR-15 | Justeg's own favicon carries a hidden message, so the feature can be demonstrated without a third-party site. |
+
+### Compatibility and explanation
+
+| ID | Requirement |
+|---|---|
+| FR-16 | Messages hidden by the 2022 prototype in Netpbm images can be revealed, and are labelled as the prototype's format. New messages are always written in the current format. |
+| FR-17 | The page explains how LSB steganography works with diagrams, including an interactive demonstration of why a lowest-bit change is not visible, backed by a measured colour difference. |
 
 ## Non-functional requirements
 
@@ -73,7 +80,7 @@ This document states what the app must do (functional requirements), how well it
 |---|---|
 | NFR-Q1 | The steganography core is pure TypeScript with no browser or framework dependencies, so it can be unit tested in Node. |
 | NFR-Q2 | Every pull request must pass lint, type-check, unit tests and a production build in CI. |
-| NFR-Q3 | Round-trip tests cover both bit depths, both modes, Unicode, empty and exactly-full messages, wrong passphrases and tampering. |
+| NFR-Q3 | Round-trip tests cover both bit depths, both modes, Unicode, empty and exactly-full messages, wrong passphrases and tampering. The Netpbm codec and the prototype reader are tested against the prototype's own sample images. |
 
 ### Performance
 
@@ -103,5 +110,5 @@ This document states what the app must do (functional requirements), how well it
 
 - Surviving lossy recompression, resizing or social-media upload. LSB data does not survive these; the UI says so.
 - Hiding files or images inside images.
-- Reading images produced by the 2022 Python prototype (raw PBM bytes with a 7-bit EOT marker).
+- Writing messages in the 2022 prototype's format.
 - Accounts, storage, or sharing images through the server.
