@@ -35,27 +35,16 @@
   50% { opacity: 0.35; }
 }
 
+/* The cut corners carry the edge gradient: lavender in, mint out. */
 .card {
+  composes: chamfer from "./Edges.module.css";
+  --c: 28px;
+  --edge: rgb(var(--uv-rgb) / 0.6);
+  --edge-end: rgb(var(--glow-rgb) / 0.45);
+  --edge-image: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.6), var(--line-strong) 35%, var(--line-strong) 65%, rgb(var(--glow-rgb) / 0.45));
+  --fill-image: linear-gradient(180deg, var(--ink-3), var(--ink-2));
   position: relative;
-  border-radius: calc(var(--radius) + 8px);
-  border: 1px solid var(--line);
-  background: linear-gradient(180deg, rgb(22 19 34 / 0.85), rgb(14 12 22 / 0.92));
-  backdrop-filter: blur(18px);
-  box-shadow: 0 40px 120px -40px rgb(139 92 255 / 0.35);
   overflow: hidden;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  padding: 1px;
-  background: linear-gradient(135deg, rgb(139 92 255 / 0.6), transparent 35%, transparent 65%, rgb(212 255 58 / 0.35));
-  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  pointer-events: none;
 }
 
 .tabs {
@@ -88,7 +77,7 @@
 
 .tab[aria-selected="true"] {
   color: var(--paper);
-  background: rgb(139 92 255 / 0.07);
+  background: rgb(var(--uv-rgb) / 0.06);
 }
 
 .tab[aria-selected="true"]::after {
@@ -99,7 +88,6 @@
   bottom: -1px;
   height: 2px;
   background: linear-gradient(90deg, var(--uv), var(--glow));
-  box-shadow: 0 0 16px var(--uv);
 }
 
 .tabLabel {

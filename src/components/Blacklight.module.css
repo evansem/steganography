@@ -9,9 +9,9 @@
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(520px circle at var(--mx) var(--my), rgb(139 92 255 / 0.2), transparent 60%),
-    radial-gradient(900px circle at 85% -10%, rgb(139 92 255 / 0.12), transparent 60%),
-    radial-gradient(700px circle at -10% 110%, rgb(212 255 58 / 0.05), transparent 60%);
+    radial-gradient(520px circle at var(--mx) var(--my), rgb(var(--uv-rgb) / 0.14), transparent 60%),
+    radial-gradient(900px circle at 85% -10%, rgb(var(--uv-rgb) / 0.09), transparent 60%),
+    radial-gradient(700px circle at -10% 110%, rgb(var(--glow-rgb) / 0.05), transparent 60%);
 }
 
 .grain {
@@ -32,7 +32,7 @@
 @media (hover: none) {
   .lamp {
     background:
-      radial-gradient(600px circle at 70% 20%, rgb(139 92 255 / 0.18), transparent 60%),
-      radial-gradient(700px circle at -10% 110%, rgb(212 255 58 / 0.05), transparent 60%);
+      radial-gradient(600px circle at 70% 20%, rgb(var(--uv-rgb) / 0.12), transparent 60%),
+      radial-gradient(700px circle at -10% 110%, rgb(var(--glow-rgb) / 0.05), transparent 60%);
   }
 }

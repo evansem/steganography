@@ -20,8 +20,8 @@ function render(): Uint8ClampedArray {
   const data = new Uint8ClampedArray(SIZE * SIZE * 4);
   const ink = [7, 6, 11];
   const white = [255, 255, 255];
-  const glow = [212, 255, 58];
-  const uv = [139, 92, 255];
+  const glow = [178, 240, 206];
+  const uv = [184, 164, 255];
 
   for (let y = 0; y < SIZE; y++) {
     for (let x = 0; x < SIZE; x++) {

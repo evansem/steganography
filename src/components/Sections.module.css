@@ -25,7 +25,7 @@
   height: 22px;
   border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%;
   background: radial-gradient(circle at 35% 30%, #fff 0 8%, var(--glow) 30%, var(--uv) 100%);
-  box-shadow: 0 0 18px rgb(212 255 58 / 0.5);
+  box-shadow: 0 0 18px rgb(var(--glow-rgb) / 0.35);
 }
 
 .navLinks {
@@ -67,29 +67,34 @@
   font-family: var(--font-mono);
 }
 
+.bit {
+  composes: pixel from "./Edges.module.css";
+}
+
+.hiddenBit {
+  composes: pixel from "./Edges.module.css";
+}
+
 .bit,
 .hiddenBit {
+  --pixel: 4px;
   display: grid;
   place-items: center;
   width: clamp(34px, 6vw, 56px);
   aspect-ratio: 3 / 4;
-  border-radius: 10px;
   font-size: clamp(18px, 3vw, 28px);
-  border: 1px solid var(--line-strong);
-  background: var(--ink-2);
+  background: var(--ink-3);
   color: var(--muted);
 }
 
 .hiddenBit {
   color: var(--ink);
   background: var(--glow);
-  border-color: var(--glow);
-  box-shadow: 0 0 30px rgb(212 255 58 / 0.5);
   animation: flip 3s steps(1) infinite;
 }
 
 @keyframes flip {
-  50% { background: var(--uv); border-color: var(--uv); box-shadow: 0 0 30px rgb(139 92 255 / 0.6); }
+  50% { background: var(--uv); }
 }
 
 .byteNote {
@@ -107,12 +112,25 @@
   margin: 0;
 }
 
+.step {
+  composes: chamfer from "./Edges.module.css";
+}
+
+.tile {
+  composes: chamfer from "./Edges.module.css";
+}
+
 .step,
 .tile {
+  --c: var(--cut);
+  --edge: var(--line);
+  --fill: var(--ink-2);
   padding: 24px;
-  border-radius: var(--radius);
-  border: 1px solid var(--line);
-  background: rgb(14 12 22 / 0.7);
+}
+
+.step:hover,
+.tile:hover {
+  --edge: rgb(var(--uv-rgb) / 0.35);
 }
 
 .step h3,
@@ -152,10 +170,11 @@
 }
 
 .limits {
+  composes: brackets from "./Edges.module.css";
+  --tick: var(--danger);
   margin-top: 16px;
   padding: 24px;
-  border-radius: var(--radius);
-  border: 1px dashed rgb(255 107 134 / 0.4);
+  border: 1px dashed rgb(var(--danger-rgb) / 0.35);
 }
 
 .limits h3 {
