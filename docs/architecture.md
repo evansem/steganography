@@ -26,15 +26,16 @@ flowchart TB
 
 | Module | Responsibility | Depends on |
 |---|---|---|
-| `src/lib/stego` | Bit packing, slot orders, plain and sealed containers, the public `hide` / `reveal` / `capacity` API. | Web Crypto only. No DOM, no React. |
+| `src/lib/stego` | Pixel and UTF-8 primitives, bit packing, slot orders, plain and sealed containers, the 2022 prototype reader, the public `hide` / `reveal` / `capacity` API. | Web Crypto only. No DOM, no React. |
 | `src/lib/image.ts` | Turns files into RGBA pixels and back into PNG or PPM, with colour-space conversion off; forensic views. | Canvas, `createImageBitmap`, `lib/netpbm`. |
 | `src/lib/netpbm.ts` | Netpbm (P1–P6) reader and binary PPM writer, since browsers cannot decode the format. | Nothing. |
 | `src/lib/colour.ts` | sRGB to CIELAB and ΔE, used by the "How it works" diagrams. | Nothing. |
 | `src/lib/favicon` | Server-only: parse the site input, discover icon links, fetch safely, sniff formats, rate limit. | `node:http(s)`, `node:dns`. |
-| `src/components` | React UI. Each panel owns its state; shared controls are CSS modules. | `lib/*`. |
+| `src/components` | React UI. Each panel owns its state; shared controls are CSS modules and small components such as `StatusMessage`. | `lib/*`, `hooks`. |
+| `src/hooks` | Client-side React hooks shared by components, such as rAF-throttled pointer tracking. | React. |
 | `src/app` | Next.js routes, layout, global design tokens, icon. | Everything above. |
 
-The dependency direction is one way: `app → components → lib`. `lib/stego` imports nothing from the rest of the app, which is what makes it testable in Node (NFR-Q1).
+The dependency direction is one way: `app → components → hooks, lib`. `lib/stego` imports nothing from the rest of the app, which is what makes it testable in Node (NFR-Q1).
 
 ## The steganography core
 
@@ -134,7 +135,7 @@ sequenceDiagram
 | Favicon server | Vitest (Node) | Blocked address ranges, URL policy, DNS guard, link discovery and ranking, magic-byte sniffing. |
 | UI | Manual and Playwright smoke run | Hide → download → reveal; wrong passphrase; favicon Easter egg; mobile width. |
 
-CI runs lint, type-check, all unit tests and a production build on every pull request (NFR-Q2).
+CI runs a Prettier format check, lint, type-check, all unit tests and a production build on every pull request (NFR-Q2).
 
 ## Decisions
 
