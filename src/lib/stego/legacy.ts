@@ -1,6 +1,3 @@
-import { NoMessageError } from "./errors";
-import { slotCount, type ImageLike } from "./plain";
-
 /**
  * Reader for messages hidden by the 2022 Python prototype (legacy/python).
  *
@@ -13,29 +10,36 @@ import { slotCount, type ImageLike } from "./plain";
  * The format has no signature, so a message only counts when it is not
  * empty, every character is printable and the terminator is found.
  */
-const EOT_7 = 0b0000100;
+import { NoMessageError } from "./errors";
+import { slotToByte } from "./order";
+import { slotCount, type ImageLike } from "./pixels";
+
+const BITS_PER_SLOT = 2;
+const CHAR_BITS = 7;
+const EOT = 0b0000100;
 
 export function extractLegacy(image: ImageLike): { text: string } {
-  const slots = slotCount(image);
-  const totalBits = slots * 2;
+  const totalBits = slotCount(image) * BITS_PER_SLOT;
+
+  /** Reads `count` bits starting at bit `from`, most significant first. */
   const read = (from: number, count: number) => {
     let value = 0;
     for (let i = from; i < from + count; i++) {
-      const slot = i >> 1;
-      const byte = image.data[Math.floor(slot / 3) * 4 + (slot % 3)]!;
-      value = (value << 1) | ((byte >> (1 - (i & 1))) & 1);
+      const byte = image.data[slotToByte(Math.floor(i / BITS_PER_SLOT))]!;
+      const shift = BITS_PER_SLOT - 1 - (i % BITS_PER_SLOT);
+      value = (value << 1) | ((byte >> shift) & 1);
     }
     return value;
   };
 
   let text = "";
-  for (let position = 0; position + 7 <= totalBits; position += 7) {
-    const ended = read(position, 7) === EOT_7 || (position + 8 <= totalBits && read(position, 8) === EOT_7);
-    if (ended) {
+  for (let position = 0; position + CHAR_BITS <= totalBits; position += CHAR_BITS) {
+    const code = read(position, CHAR_BITS);
+    const paddedEot = position + CHAR_BITS + 1 <= totalBits && read(position, CHAR_BITS + 1) === EOT;
+    if (code === EOT || paddedEot) {
       if (text.length === 0) break;
       return { text };
     }
-    const code = read(position, 7);
     if (!isPrintable(code)) break;
     text += String.fromCharCode(code);
   }
@@ -43,5 +47,6 @@ export function extractLegacy(image: ImageLike): { text: string } {
 }
 
 function isPrintable(code: number): boolean {
-  return (code >= 0x20 && code < 0x7f) || code === 0x09 || code === 0x0a || code === 0x0d;
+  const isTabOrNewline = code === 0x09 || code === 0x0a || code === 0x0d;
+  return (code >= 0x20 && code < 0x7f) || isTabOrNewline;
 }

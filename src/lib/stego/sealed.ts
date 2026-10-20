@@ -1,9 +1,10 @@
 import { CapacityError, NoMessageError } from "./errors";
 import { IV_BYTES, SALT_BYTES, TAG_BYTES, deriveKeys, open, randomBytes, seal } from "./crypto";
-import { bytesForSlots, readBits, slotsForBytes, writeBits, type BitDepth } from "./lsb";
+import { BIT_DEPTHS, bytesForSlots, readBits, slotsForBytes, writeBits, type BitDepth } from "./lsb";
 import { sequentialOrder } from "./order";
-import { opaqueCopy, slotCount, type ImageLike } from "./plain";
+import { opaqueCopy, slotCount, type ImageLike } from "./pixels";
 import { scatterOrder } from "./scatter";
+import { decodeUtf8, encodeUtf8 } from "./text";
 
 /**
  * Encrypted container. There is no magic number, so a sealed image carries
@@ -24,7 +25,9 @@ function layout(image: ImageLike, depth: BitDepth) {
   return { total, saltSlots, scatterSlots: Math.max(0, total - saltSlots) };
 }
 
-const aadFor = (depth: BitDepth) => new Uint8Array([0x4a, 0x53, 2, depth]);
+/** "JS", container version 2, then the bit depth. */
+const AAD_PREFIX = [0x4a, 0x53, 2] as const;
+const aadFor = (depth: BitDepth) => new Uint8Array([...AAD_PREFIX, depth]);
 
 /** Maximum UTF-8 bytes a sealed message can use in this image. */
 export function sealedCapacity(image: ImageLike, depth: BitDepth): number {
@@ -37,7 +40,7 @@ export async function embedSealed(
   passphrase: string,
   depth: BitDepth,
 ): Promise<Uint8ClampedArray> {
-  const body = new TextEncoder().encode(text);
+  const body = encodeUtf8(text);
   const capacity = sealedCapacity(image, depth);
   if (body.length > capacity) throw new CapacityError(body.length, capacity);
 
@@ -63,7 +66,7 @@ export async function embedSealed(
  * indistinguishable by design, so both raise {@link NoMessageError}.
  */
 export async function extractSealed(image: ImageLike, passphrase: string): Promise<{ text: string; depth: BitDepth }> {
-  for (const depth of [1, 2] as const) {
+  for (const depth of BIT_DEPTHS) {
     const { total, saltSlots, scatterSlots } = layout(image, depth);
     const maxFrame = bytesForSlots(scatterSlots, depth);
     if (maxFrame < OVERHEAD) continue;
@@ -72,18 +75,16 @@ export async function extractSealed(image: ImageLike, passphrase: string): Promi
     const keys = await deriveKeys(passphrase, salt);
     const order = scatterOrder(scatterSlots, keys.scatterKey, saltSlots);
 
-    const length = new DataView(readBits(image.data, order, 0, LENGTH_BYTES, depth).buffer).getUint32(0);
+    const lengthBytes = readBits(image.data, order, 0, LENGTH_BYTES, depth);
+    const length = new DataView(lengthBytes.buffer).getUint32(0);
     if (length < TAG_BYTES || LENGTH_BYTES + IV_BYTES + length > maxFrame) continue;
 
     const rest = readBits(image.data, order, slotsForBytes(LENGTH_BYTES, depth), IV_BYTES + length, depth);
     const plaintext = await open(keys.aesKey, rest.subarray(0, IV_BYTES), rest.subarray(IV_BYTES), aadFor(depth));
     if (!plaintext) continue;
 
-    try {
-      return { text: new TextDecoder("utf-8", { fatal: true }).decode(plaintext), depth };
-    } catch {
-      continue;
-    }
+    const text = decodeUtf8(plaintext);
+    if (text !== null) return { text, depth };
   }
   throw new NoMessageError("No message found. The passphrase may be wrong.");
 }

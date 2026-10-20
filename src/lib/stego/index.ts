@@ -3,6 +3,7 @@ export * from "./errors";
 export * from "./legacy";
 export * from "./lsb";
 export * from "./order";
+export * from "./pixels";
 export * from "./plain";
 export * from "./scatter";
 export * from "./sealed";
