@@ -13,7 +13,12 @@ describe("colour difference", () => {
   });
 
   it("keeps a lowest-bit flip below the just-noticeable difference", () => {
-    for (const colour of [[182, 104, 214], [12, 10, 20], [240, 238, 245], [118, 164, 212]] as const) {
+    for (const colour of [
+      [182, 104, 214],
+      [12, 10, 20],
+      [240, 238, 245],
+      [118, 164, 212],
+    ] as const) {
       expect(deltaE(colour, flipBit(colour, 0))).toBeLessThan(JND);
       expect(deltaE(colour, flipBit(colour, 7))).toBeGreaterThan(10 * JND);
     }

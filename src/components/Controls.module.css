@@ -142,7 +142,9 @@
   width: 18px;
   height: 18px;
   background: var(--muted);
-  transition: transform 0.25s var(--ease), background-color 0.2s var(--ease);
+  transition:
+    transform 0.25s var(--ease),
+    background-color 0.2s var(--ease);
 }
 
 .switch input:checked {
@@ -202,7 +204,10 @@
   font-weight: 600;
   text-decoration: none;
   cursor: pointer;
-  transition: transform 0.2s var(--ease), filter 0.2s var(--ease), opacity 0.2s;
+  transition:
+    transform 0.2s var(--ease),
+    filter 0.2s var(--ease),
+    opacity 0.2s;
 }
 
 .primary {
@@ -250,7 +255,9 @@
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .status {
@@ -272,7 +279,8 @@
   composes: dissolve from "./Edges.module.css";
   --p: var(--dither-lg);
   --edge: rgb(var(--glow-rgb) / 0.4);
-  --fill-image: radial-gradient(400px circle at 0 0, var(--glow-soft), transparent 70%), linear-gradient(var(--ink) 0 0);
+  --fill-image:
+    radial-gradient(400px circle at 0 0, var(--glow-soft), transparent 70%), linear-gradient(var(--ink) 0 0);
   position: relative;
   padding: 18px 20px;
   font-family: var(--font-mono);

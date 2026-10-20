@@ -32,7 +32,9 @@
 }
 
 @keyframes pulse {
-  50% { opacity: 0.35; }
+  50% {
+    opacity: 0.35;
+  }
 }
 
 /* The dithered edge carries a gradient: lavender in, mint out. */
@@ -40,7 +42,13 @@
   composes: dissolve from "./Edges.module.css";
   --p: 4px;
   --edge: rgb(var(--uv-rgb) / 0.6);
-  --edge-image: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.6), var(--line-strong) 35%, var(--line-strong) 65%, rgb(var(--glow-rgb) / 0.45));
+  --edge-image: linear-gradient(
+    135deg,
+    rgb(var(--uv-rgb) / 0.6),
+    var(--line-strong) 35%,
+    var(--line-strong) 65%,
+    rgb(var(--glow-rgb) / 0.45)
+  );
   --fill-image: linear-gradient(180deg, var(--ink-3), var(--ink-2));
   position: relative;
   overflow: hidden;
@@ -63,7 +71,9 @@
   text-align: left;
   cursor: pointer;
   color: var(--muted);
-  transition: color 0.2s var(--ease), background-color 0.2s var(--ease);
+  transition:
+    color 0.2s var(--ease),
+    background-color 0.2s var(--ease);
 }
 
 .tab + .tab {

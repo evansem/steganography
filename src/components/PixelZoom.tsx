@@ -47,8 +47,8 @@ export function PixelZoom() {
       </figcaption>
 
       <p className={styles.figLead}>
-        “{LETTER}” is byte {CODE}, or <code>{MESSAGE_BITS.join("")}</code> in binary. Each bit replaces the lowest
-        bit of one colour channel, so it takes eight channels: just under three pixels.
+        “{LETTER}” is byte {CODE}, or <code>{MESSAGE_BITS.join("")}</code> in binary. Each bit replaces the lowest bit
+        of one colour channel, so it takes eight channels: just under three pixels.
       </p>
 
       <div className={styles.zoom}>

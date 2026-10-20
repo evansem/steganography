@@ -34,23 +34,17 @@
 
   border: 0;
   background:
-    var(--fill-image, linear-gradient(var(--_f) 0 0))
-      center / calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)) no-repeat,
+    var(--fill-image, linear-gradient(var(--_f) 0 0)) center / calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p))
+      no-repeat,
     var(--edge-image, linear-gradient(var(--_e) 0 0));
   -webkit-mask-image:
-    conic-gradient(#000 0 25%, transparent 0),
-    linear-gradient(#000 0 0),
-    repeating-conic-gradient(#000 0 25%, transparent 0 50%),
-    linear-gradient(#000 0 0),
-    conic-gradient(#000 0 75%, transparent 0),
-    linear-gradient(#000 0 0);
+    conic-gradient(#000 0 25%, transparent 0), linear-gradient(#000 0 0),
+    repeating-conic-gradient(#000 0 25%, transparent 0 50%), linear-gradient(#000 0 0),
+    conic-gradient(#000 0 75%, transparent 0), linear-gradient(#000 0 0);
   mask-image:
-    conic-gradient(#000 0 25%, transparent 0),
-    linear-gradient(#000 0 0),
-    repeating-conic-gradient(#000 0 25%, transparent 0 50%),
-    linear-gradient(#000 0 0),
-    conic-gradient(#000 0 75%, transparent 0),
-    linear-gradient(#000 0 0);
+    conic-gradient(#000 0 25%, transparent 0), linear-gradient(#000 0 0),
+    repeating-conic-gradient(#000 0 25%, transparent 0 50%), linear-gradient(#000 0 0),
+    conic-gradient(#000 0 75%, transparent 0), linear-gradient(#000 0 0);
   -webkit-mask-size:
     var(--_t) var(--_t),
     calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
@@ -65,8 +59,20 @@
     calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
     var(--_t) var(--_t),
     calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p));
-  -webkit-mask-position: 0 0, center, 0 0, center, 0 0, center;
-  mask-position: 0 0, center, 0 0, center, 0 0, center;
+  -webkit-mask-position:
+    0 0,
+    center,
+    0 0,
+    center,
+    0 0,
+    center;
+  mask-position:
+    0 0,
+    center,
+    0 0,
+    center,
+    0 0,
+    center;
   -webkit-mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
   mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
   -webkit-mask-composite: source-over, source-in, source-over, source-in, source-over, source-over;

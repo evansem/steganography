@@ -11,7 +11,10 @@
   border: 1.5px dashed var(--line-strong);
   background-color: var(--ink-2);
   cursor: pointer;
-  transition: border-color 0.2s var(--ease), background-color 0.2s var(--ease), transform 0.2s var(--ease);
+  transition:
+    border-color 0.2s var(--ease),
+    background-color 0.2s var(--ease),
+    transform 0.2s var(--ease);
 }
 
 .zone:hover,

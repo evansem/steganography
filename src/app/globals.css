@@ -6,11 +6,26 @@
 
 /* Edge knobs for components/Edges.module.css. Non-inherited, so each element
    only gets the edge it asks for. */
-@property --p { syntax: "*"; inherits: false; }
-@property --edge { syntax: "*"; inherits: false; }
-@property --edge-image { syntax: "*"; inherits: false; }
-@property --fill { syntax: "*"; inherits: false; }
-@property --fill-image { syntax: "*"; inherits: false; }
+@property --p {
+  syntax: "*";
+  inherits: false;
+}
+@property --edge {
+  syntax: "*";
+  inherits: false;
+}
+@property --edge-image {
+  syntax: "*";
+  inherits: false;
+}
+@property --fill {
+  syntax: "*";
+  inherits: false;
+}
+@property --fill-image {
+  syntax: "*";
+  inherits: false;
+}
 
 :root {
   color-scheme: dark;
