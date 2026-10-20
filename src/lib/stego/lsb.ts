@@ -2,6 +2,9 @@ import { slotToByte, type SlotOrder } from "./order";
 
 export type BitDepth = 1 | 2;
 
+/** Depths a reader tries, in order. */
+export const BIT_DEPTHS: readonly BitDepth[] = [1, 2];
+
 /** Number of whole bytes that fit in `slots` channels at the given depth. */
 export function bytesForSlots(slots: number, depth: BitDepth): number {
   return Math.floor((slots * depth) / 8);

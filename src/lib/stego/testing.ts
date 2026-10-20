@@ -1,4 +1,4 @@
-import type { ImageLike } from "./plain";
+import type { ImageLike } from "./pixels";
 
 /** Deterministic noisy RGBA image for tests. */
 export function fakeImage(width: number, height: number, seed = 1): ImageLike {
