@@ -1,12 +1,14 @@
 import { findIconLinks, rankIcons } from "./discover";
-import { FetchBlockedError, FetchFailedError, safeFetch } from "./fetcher";
+import { FetchBlockedError, FetchFailedError, safeFetch, type FetchLimits } from "./fetcher";
 import { MIME, sniffImage, type IconFormat } from "./sniff";
 
 export { FetchBlockedError, FetchFailedError } from "./fetcher";
 
-const PAGE_LIMITS = { maxBytes: 512 * 1024, timeoutMs: 5000, maxRedirects: 3 };
-const ICON_LIMITS = { maxBytes: 1024 * 1024, timeoutMs: 5000, maxRedirects: 3 };
+const PAGE_LIMITS: FetchLimits = { maxBytes: 512 * 1024, timeoutMs: 5000, maxRedirects: 3 };
+const ICON_LIMITS: FetchLimits = { maxBytes: 1024 * 1024, timeoutMs: 5000, maxRedirects: 3 };
 const MAX_CANDIDATES = 4;
+const MAX_INPUT_LENGTH = 2048;
+const HAS_SCHEME = /^[a-z][a-z\d+.-]*:\/\//i;
 
 export interface Favicon {
   source: string;
@@ -18,9 +20,9 @@ export interface Favicon {
 /** Accepts "example.com", "https://example.com/path" and similar. */
 export function parseSiteInput(input: string): URL {
   const trimmed = input.trim();
-  if (!trimmed || trimmed.length > 2048) throw new FetchBlockedError("Enter a website address.");
+  if (!trimmed || trimmed.length > MAX_INPUT_LENGTH) throw new FetchBlockedError("Enter a website address.");
   try {
-    return new URL(/^[a-z][a-z\d+.-]*:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`);
+    return new URL(HAS_SCHEME.test(trimmed) ? trimmed : `https://${trimmed}`);
   } catch {
     throw new FetchBlockedError("That does not look like a website address.");
   }

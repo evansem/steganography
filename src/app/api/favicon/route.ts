@@ -5,7 +5,9 @@ import { createRateLimiter } from "@/lib/favicon/rate-limit";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const allow = createRateLimiter(20, 60_000);
+const LOOKUPS_PER_MINUTE = 20;
+const allow = createRateLimiter(LOOKUPS_PER_MINUTE, 60_000);
+const DNS_NOT_FOUND = new Set(["ENOTFOUND", "EAI_AGAIN"]);
 
 /**
  * GET /api/favicon?site=example.com
@@ -15,8 +17,7 @@ const allow = createRateLimiter(20, 60_000);
  * returned as-is; all steganography still happens on the client.
  */
 export async function GET(request: NextRequest) {
-  const client = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
-  if (!allow(client)) {
+  if (!allow(clientKey(request))) {
     return problem(429, "Too many lookups. Try again in a minute.");
   }
 
@@ -36,10 +37,15 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     if (error instanceof FetchBlockedError) return problem(400, error.message);
     if (error instanceof FetchFailedError) return problem(502, error.message);
-    const code = (error as NodeJS.ErrnoException).code;
-    if (code === "ENOTFOUND" || code === "EAI_AGAIN") return problem(502, "That website could not be found.");
+    const { code } = error as NodeJS.ErrnoException;
+    if (code && DNS_NOT_FOUND.has(code)) return problem(502, "That website could not be found.");
     return problem(502, "The website could not be reached.");
   }
+}
+
+/** First hop of X-Forwarded-For, as set by the reverse proxy in front of the app. */
+function clientKey(request: NextRequest): string {
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 }
 
 function problem(status: number, detail: string) {

@@ -39,13 +39,13 @@ function isBlockedV6(address: string): boolean {
   if (embedded) return isBlockedV4(embedded[1]!);
   if (lower.startsWith("::ffff:")) return true;
 
-  const first = parseInt(lower.split(":")[0] || "0", 16);
+  const [first = 0, second = 0] = lower.split(":", 2).map((hextet) => parseInt(hextet || "0", 16));
   return (
     (first & 0xfe00) === 0xfc00 || // unique local fc00::/7
     (first & 0xffc0) === 0xfe80 || // link-local fe80::/10
     (first & 0xffc0) === 0xfec0 || // site-local (deprecated)
     (first & 0xff00) === 0xff00 || // multicast
-    (first === 0x2001 && parseInt(lower.split(":")[1] || "0", 16) === 0x0db8) || // documentation
+    (first === 0x2001 && second === 0x0db8) || // documentation 2001:db8::/32
     first === 0 // other reserved ::/16 forms
   );
 }
