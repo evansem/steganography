@@ -313,3 +313,11 @@
   background: var(--uv-soft);
   color: var(--uv-bright);
 }
+
+.grow {
+  flex: 1 1 260px;
+}
+
+.wrapAnywhere {
+  overflow-wrap: anywhere;
+}
