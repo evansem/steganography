@@ -29,7 +29,7 @@ The name comes from the idea behind it: **ju**st a simple **steg**anography tool
 | [Threat model](docs/threat-model.md) | STRIDE analysis and honest limits |
 | [Decisions](docs/adr/) | Why client-side, why a length header, why Feistel, how the proxy is hardened |
 
-**Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, Vitest, ESLint, GitHub Actions.
+**Stack:** Next.js 16, React 19, TypeScript (strict), Web Crypto, Vitest, ESLint, Prettier, GitHub Actions.
 
 ## Quick start
 
@@ -39,6 +39,15 @@ npm run dev
 ```
 
 Then open http://localhost:3000.
+
+Before pushing, run the same checks as CI:
+
+```bash
+npm run format:check   # Prettier; `npm run format` fixes it
+npm run lint
+npm run typecheck
+npm test
+```
 
 For production, any Node.js 20.9+ host works: `npm ci`, `npm run build`, then `npm start`. The favicon reader needs a Node runtime, so a purely static host is not enough.
 

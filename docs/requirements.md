@@ -79,7 +79,7 @@ This document states what the app must do (functional requirements), how well it
 | ID | Requirement |
 |---|---|
 | NFR-Q1 | The steganography core is pure TypeScript with no browser or framework dependencies, so it can be unit tested in Node. |
-| NFR-Q2 | Every pull request must pass lint, type-check, unit tests and a production build in CI. |
+| NFR-Q2 | Every pull request must pass a format check, lint, type-check, unit tests and a production build in CI. |
 | NFR-Q3 | Round-trip tests cover both bit depths, both modes, Unicode, empty and exactly-full messages, wrong passphrases and tampering. The Netpbm codec and the prototype reader are tested against the prototype's own sample images. |
 
 ### Performance
