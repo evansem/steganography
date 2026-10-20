@@ -1,8 +1,12 @@
-import { lookup as dnsLookup, type LookupAddress } from "node:dns";
+import { lookup as dnsLookup } from "node:dns";
 import http from "node:http";
 import https from "node:https";
 import type { LookupFunction } from "node:net";
 import { isBlockedAddress } from "./address";
+
+const USER_AGENT = "JustegFaviconReader/2.0 (+https://github.com/evansem/steganography)";
+const ALLOWED_PORTS = new Set(["", "80", "443"]);
+const LOCAL_SUFFIXES = [".localhost", ".internal", ".local"];
 
 /** The request breaks policy (private address, bad scheme…). Never retried. */
 export class FetchBlockedError extends Error {
@@ -33,6 +37,13 @@ export interface FetchedResource {
   body: Buffer;
 }
 
+interface RawResponse {
+  status: number;
+  contentType: string;
+  location?: string;
+  body: Buffer;
+}
+
 /**
  * DNS lookup that refuses to connect to internal addresses. Because the
  * check runs inside the socket's own lookup, the address that is validated
@@ -41,13 +52,12 @@ export interface FetchedResource {
 export const safeLookup: LookupFunction = (hostname, options, callback) => {
   dnsLookup(hostname, { ...options, all: true }, (error, addresses) => {
     if (error) return callback(error, "", 0);
-    const list = addresses as LookupAddress[];
-    const allowed = list.filter((entry) => !isBlockedAddress(entry.address));
-    if (allowed.length === 0 || allowed.length !== list.length) {
+    // Refuse the host if any of its addresses is internal, not just the first.
+    if (addresses.length === 0 || addresses.some((entry) => isBlockedAddress(entry.address))) {
       return callback(new FetchBlockedError(`${hostname} resolves to a private or reserved address.`), "", 0);
     }
-    if (options.all) return (callback as unknown as (e: null, a: LookupAddress[]) => void)(null, allowed);
-    const first = allowed[0]!;
+    if (options.all) return callback(null, addresses);
+    const first = addresses[0]!;
     callback(null, first.address, first.family);
   });
 };
@@ -58,16 +68,15 @@ export function assertPublicUrl(url: URL): void {
     throw new FetchBlockedError("Only http and https addresses are allowed.");
   }
   if (url.username || url.password) throw new FetchBlockedError("Addresses with credentials are not allowed.");
-  if (url.port && url.port !== "80" && url.port !== "443") {
+  if (!ALLOWED_PORTS.has(url.port)) {
     throw new FetchBlockedError("Only the standard web ports are allowed.");
   }
   const host = url.hostname.replace(/^\[|\]$/g, "");
-  if (host === "localhost" || host.endsWith(".localhost") || host.endsWith(".internal") || host.endsWith(".local")) {
+  if (host === "localhost" || LOCAL_SUFFIXES.some((suffix) => host.endsWith(suffix))) {
     throw new FetchBlockedError("Local addresses are not allowed.");
   }
-  if (/^[\d.]+$/.test(host) || host.includes(":")) {
-    if (isBlockedAddress(host)) throw new FetchBlockedError("That address is private or reserved.");
-  }
+  const isLiteralIp = /^[\d.]+$/.test(host) || host.includes(":");
+  if (isLiteralIp && isBlockedAddress(host)) throw new FetchBlockedError("That address is private or reserved.");
 }
 
 /**
@@ -79,7 +88,7 @@ export async function safeFetch(input: URL, limits: FetchLimits): Promise<Fetche
   for (let hop = 0; hop <= limits.maxRedirects; hop++) {
     assertPublicUrl(url);
     const response = await requestOnce(url, limits);
-    if (response.status >= 300 && response.status < 400 && response.location) {
+    if (isRedirect(response.status) && response.location) {
       url = new URL(response.location, url);
       continue;
     }
@@ -88,10 +97,11 @@ export async function safeFetch(input: URL, limits: FetchLimits): Promise<Fetche
   throw new FetchFailedError("Too many redirects.");
 }
 
-function requestOnce(
-  url: URL,
-  limits: FetchLimits,
-): Promise<{ status: number; contentType: string; location?: string; body: Buffer }> {
+function isRedirect(status: number): boolean {
+  return status >= 300 && status < 400;
+}
+
+function requestOnce(url: URL, limits: FetchLimits): Promise<RawResponse> {
   const client = url.protocol === "https:" ? https : http;
   return new Promise((resolve, reject) => {
     const request = client.get(
@@ -100,7 +110,7 @@ function requestOnce(
         lookup: safeLookup,
         timeout: limits.timeoutMs,
         headers: {
-          "user-agent": "JustegFaviconReader/2.0 (+https://github.com/evansem/steganography)",
+          "user-agent": USER_AGENT,
           accept: "text/html,image/*;q=0.9,*/*;q=0.1",
         },
       },
@@ -108,24 +118,22 @@ function requestOnce(
         const status = response.statusCode ?? 0;
         const contentType = String(response.headers["content-type"] ?? "").toLowerCase();
         const location = response.headers.location;
-        if (status >= 300 && status < 400) {
+        if (isRedirect(status)) {
           response.resume();
           return resolve({ status, contentType, location, body: Buffer.alloc(0) });
         }
-        const declared = Number(response.headers["content-length"] ?? 0);
-        if (declared > limits.maxBytes) {
+        const tooLarge = () => {
           response.destroy();
-          return reject(new FetchFailedError("The response is too large."));
-        }
+          reject(new FetchFailedError("The response is too large."));
+        };
+        const declared = Number(response.headers["content-length"] ?? 0);
+        if (declared > limits.maxBytes) return tooLarge();
+
         const chunks: Buffer[] = [];
         let size = 0;
         response.on("data", (chunk: Buffer) => {
           size += chunk.length;
-          if (size > limits.maxBytes) {
-            response.destroy();
-            reject(new FetchFailedError("The response is too large."));
-            return;
-          }
+          if (size > limits.maxBytes) return tooLarge();
           chunks.push(chunk);
         });
         response.on("end", () => resolve({ status, contentType, body: Buffer.concat(chunks) }));
