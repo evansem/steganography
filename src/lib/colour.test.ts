@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { deltaE, flipBit, JND, toLab } from "./colour";
+import { deltaE, flipBit, JND, rgbCss, toBits, toLab } from "./colour";
 
 describe("colour difference", () => {
   it("maps white and black to the ends of the lightness axis", () => {
@@ -22,5 +22,12 @@ describe("colour difference", () => {
       expect(deltaE(colour, flipBit(colour, 0))).toBeLessThan(JND);
       expect(deltaE(colour, flipBit(colour, 7))).toBeGreaterThan(10 * JND);
     }
+  });
+});
+
+describe("formatting helpers", () => {
+  it("writes CSS colours and 8-bit binary", () => {
+    expect(rgbCss([182, 104, 214])).toBe("rgb(182 104 214)");
+    expect(toBits(5)).toBe("00000101");
   });
 });

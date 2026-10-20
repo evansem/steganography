@@ -21,6 +21,12 @@ export class NetpbmError extends Error {
 
 export const NETPBM_EXTENSIONS = [".pbm", ".pgm", ".ppm", ".pnm"] as const;
 
+/** The file name's Netpbm extension in lower case, or null if it has none. */
+export function netpbmExtension(fileName: string): string | null {
+  const lower = fileName.toLowerCase();
+  return NETPBM_EXTENSIONS.find((extension) => lower.endsWith(extension)) ?? null;
+}
+
 /** True when `bytes` start with a Netpbm magic number ("P1" to "P6"). */
 export function isNetpbm(bytes: Uint8Array): boolean {
   return bytes.length >= 3 && bytes[0] === 0x50 && bytes[1]! >= 0x31 && bytes[1]! <= 0x36 && isSpace(bytes[2]!);

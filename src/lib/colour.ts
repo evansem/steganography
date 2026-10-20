@@ -7,6 +7,8 @@
  */
 export type Rgb = readonly [number, number, number];
 
+export const CHANNELS = ["R", "G", "B"] as const;
+
 /** Just-noticeable difference for ΔE*76 (Sharma, Digital Color Imaging Handbook). */
 export const JND = 2.3;
 
@@ -34,4 +36,14 @@ export function toLab([r, g, b]: Rgb): [number, number, number] {
 export function flipBit([r, g, b]: Rgb, bit: number): Rgb {
   const m = 1 << bit;
   return [r ^ m, g ^ m, b ^ m];
+}
+
+/** CSS colour string for an RGB triple. */
+export function rgbCss([r, g, b]: Rgb): string {
+  return `rgb(${r} ${g} ${b})`;
+}
+
+/** A channel value as eight binary digits, most significant first. */
+export function toBits(value: number): string {
+  return value.toString(2).padStart(8, "0");
 }

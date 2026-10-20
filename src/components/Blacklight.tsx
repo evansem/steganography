@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { usePointerMove } from "@/hooks/usePointerMove";
 import styles from "./Blacklight.module.css";
 
 /**
@@ -8,22 +8,11 @@ import styles from "./Blacklight.module.css";
  * variables, which the glow layer and any `.uv-ink` text use as a mask.
  */
 export function Blacklight() {
-  useEffect(() => {
+  usePointerMove((event) => {
     const root = document.documentElement;
-    let frame = 0;
-    const onMove = (event: PointerEvent) => {
-      cancelAnimationFrame(frame);
-      frame = requestAnimationFrame(() => {
-        root.style.setProperty("--mx", `${event.clientX}px`);
-        root.style.setProperty("--my", `${event.clientY}px`);
-      });
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(frame);
-      window.removeEventListener("pointermove", onMove);
-    };
-  }, []);
+    root.style.setProperty("--mx", `${event.clientX}px`);
+    root.style.setProperty("--my", `${event.clientY}px`);
+  });
 
   return (
     <div className={styles.layer} aria-hidden="true">

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { encodePpm, isNetpbm, NetpbmError, parseNetpbm } from "./netpbm";
+import { encodePpm, isNetpbm, NetpbmError, netpbmExtension, parseNetpbm } from "./netpbm";
 import { fakeImage } from "./stego/testing";
 
 const ascii = (text: string) => new TextEncoder().encode(text);
@@ -19,6 +19,11 @@ describe("Netpbm", () => {
     for (let kind = 1; kind <= 6; kind++) expect(isNetpbm(ascii(`P${kind}\n`))).toBe(true);
     expect(isNetpbm(ascii("P7\n"))).toBe(false);
     expect(isNetpbm(ascii("\x89PNG"))).toBe(false);
+  });
+
+  it("finds the Netpbm extension of a file name", () => {
+    expect(netpbmExtension("sample.PBM")).toBe(".pbm");
+    expect(netpbmExtension("photo.png")).toBeNull();
   });
 
   it("reads a binary PPM written by the 2022 prototype layout", () => {

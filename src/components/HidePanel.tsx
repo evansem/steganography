@@ -3,12 +3,15 @@
 import { useMemo, useState } from "react";
 import { decodeImage, encodeNetpbm, encodePng, type LoadedImage } from "@/lib/image";
 import { formatBytes, friendlyError } from "@/lib/messages";
+import { netpbmExtension } from "@/lib/netpbm";
 import { hide, plainCapacity, sealedCapacity, type BitDepth } from "@/lib/stego";
 import styles from "./Controls.module.css";
 import { DropZone } from "./DropZone";
 import { ImageStage } from "./ImageStage";
+import { IDLE, StatusMessage, type Status } from "./StatusMessage";
 
-type Status = { tone: "idle" | "error" | "success"; text: string };
+/** Below this length the passphrase hint suggests something stronger. */
+const SHORT_PASSPHRASE = 12;
 
 interface Inputs {
   image: LoadedImage | null;
@@ -42,10 +45,11 @@ export function HidePanel() {
   const [depth, setDepth] = useState<BitDepth>(1);
   const [output, setOutput] = useState<Output | null>(null);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState<Status>({ tone: "idle", text: "" });
+  const [status, setStatus] = useState<Status>(IDLE);
 
   const used = useMemo(() => new TextEncoder().encode(text).length, [text]);
-  const available = image ? (encrypt ? sealedCapacity(image, depth) : plainCapacity(image, depth)) : 0;
+  const capacityOf = encrypt ? sealedCapacity : plainCapacity;
+  const available = image ? capacityOf(image, depth) : 0;
   const over = image !== null && used > available;
   const needsPassphrase = encrypt && passphrase.length === 0;
 
@@ -57,7 +61,7 @@ export function HidePanel() {
     setStatus({ tone: "idle", text: "Reading image…" });
     try {
       setImage(await decodeImage(file, file.name));
-      setStatus({ tone: "idle", text: "" });
+      setStatus(IDLE);
     } catch (error) {
       setStatus({ tone: "error", text: friendlyError(error) });
     }
@@ -96,8 +100,8 @@ export function HidePanel() {
   const baseName = (image?.name ?? "image").replace(/\.[^.]+$/, "");
   const downloadName = `${baseName}-justeg.png`;
   // keep the source's own Netpbm extension, as the 2022 prototype did
-  const netpbmExtension = /\.(pbm|pgm|ppm|pnm)$/i.exec(image?.name ?? "")?.[0].toLowerCase() ?? ".ppm";
-  const netpbmName = `${baseName}-justeg${netpbmExtension}`;
+  const netpbmExt = netpbmExtension(image?.name ?? "") ?? ".ppm";
+  const netpbmName = `${baseName}-justeg${netpbmExt}`;
 
   return (
     <div className={styles.panel}>
@@ -171,7 +175,7 @@ export function HidePanel() {
               placeholder="Share it with the reader separately"
             />
             <p className={styles.help}>
-              {passphrase.length > 0 && passphrase.length < 12
+              {passphrase.length > 0 && passphrase.length < SHORT_PASSPHRASE
                 ? "Tip: four or more random words make a much stronger passphrase."
                 : "Without it, the message cannot be found or read."}
             </p>
@@ -211,14 +215,12 @@ export function HidePanel() {
           )}
           {result?.netpbm && (
             <a className={styles.secondary} href={result.netpbm.url} download={netpbmName}>
-              Download {netpbmExtension.slice(1).toUpperCase()} · {formatBytes(result.netpbm.size)}
+              Download {netpbmExt.slice(1).toUpperCase()} · {formatBytes(result.netpbm.size)}
             </a>
           )}
         </div>
 
-        <p className={styles.status} data-tone={status.tone} role="status" aria-live="polite">
-          {status.text}
-        </p>
+        <StatusMessage status={status} />
       </form>
     </div>
   );

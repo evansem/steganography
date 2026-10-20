@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { decodeImage, type LoadedImage } from "@/lib/image";
 import { friendlyError } from "@/lib/messages";
 import { reveal, type Revealed } from "@/lib/stego";
@@ -8,13 +8,12 @@ import styles from "./Controls.module.css";
 import { DevelopingText } from "./DevelopingText";
 import { DropZone } from "./DropZone";
 import { ImageStage } from "./ImageStage";
-
-type Status = { tone: "idle" | "error" | "success"; text: string };
+import { IDLE, StatusMessage, type Status } from "./StatusMessage";
 
 interface Props {
   /** Preloaded image, e.g. a fetched favicon. */
   initialImage?: LoadedImage | null;
-  intro?: React.ReactNode;
+  intro?: ReactNode;
 }
 
 export function RevealPanel({ initialImage = null, intro }: Props) {
@@ -22,14 +21,14 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
   const [passphrase, setPassphrase] = useState("");
   const [found, setFound] = useState<Revealed | null>(null);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState<Status>({ tone: "idle", text: "" });
+  const [status, setStatus] = useState<Status>(IDLE);
 
   async function load(file: File) {
     setFound(null);
     setStatus({ tone: "idle", text: "Reading image…" });
     try {
       setImage(await decodeImage(file, file.name));
-      setStatus({ tone: "idle", text: "" });
+      setStatus(IDLE);
     } catch (error) {
       setStatus({ tone: "error", text: friendlyError(error) });
     }
@@ -99,9 +98,7 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
           </button>
         </div>
 
-        <p className={styles.status} data-tone={status.tone} role="status" aria-live="polite">
-          {status.text}
-        </p>
+        <StatusMessage status={status} />
 
         {found && (
           <div className={styles.field}>

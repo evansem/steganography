@@ -5,8 +5,7 @@ import { decodeImage, type LoadedImage } from "@/lib/image";
 import { friendlyError } from "@/lib/messages";
 import styles from "./Controls.module.css";
 import { RevealPanel } from "./RevealPanel";
-
-type Status = { tone: "idle" | "error"; text: string };
+import { IDLE, StatusMessage, type Status } from "./StatusMessage";
 
 interface Loaded {
   image: LoadedImage;
@@ -21,7 +20,7 @@ export function FaviconPanel() {
   const [site, setSite] = useState("");
   const [loaded, setLoaded] = useState<Loaded | null>(null);
   const [busy, setBusy] = useState(false);
-  const [status, setStatus] = useState<Status>({ tone: "idle", text: "" });
+  const [status, setStatus] = useState<Status>(IDLE);
 
   async function load(url: string, label: string, sourceFrom?: (response: Response) => string) {
     setBusy(true);
@@ -35,7 +34,7 @@ export function FaviconPanel() {
       const blob = await response.blob();
       const source = sourceFrom?.(response) ?? label;
       setLoaded({ image: await decodeImage(blob, source.split("/").pop() || label), source });
-      setStatus({ tone: "idle", text: "" });
+      setStatus(IDLE);
     } catch (error) {
       // TypeError means the request itself failed; other errors carry a readable message.
       const text = error instanceof Error && !(error instanceof TypeError) ? error.message : friendlyError(error);
@@ -64,8 +63,7 @@ export function FaviconPanel() {
         <div className={styles.actions}>
           <input
             id="favicon-site"
-            className={styles.input}
-            style={{ flex: "1 1 260px" }}
+            className={`${styles.input} ${styles.grow}`}
             inputMode="url"
             autoComplete="url"
             spellCheck={false}
@@ -90,9 +88,7 @@ export function FaviconPanel() {
           The server fetches only public web addresses, follows at most three redirects and returns raster images.
           Everything after that happens in your browser.
         </p>
-        <p className={styles.status} data-tone={status.tone} role="status" aria-live="polite">
-          {status.text}
-        </p>
+        <StatusMessage status={status} />
       </form>
 
       {loaded && (
@@ -101,7 +97,7 @@ export function FaviconPanel() {
           initialImage={loaded.image}
           intro={
             <p className={styles.help}>
-              Loaded <code style={{ overflowWrap: "anywhere" }}>{loaded.source}</code> ({loaded.image.width}×
+              Loaded <code className={styles.wrapAnywhere}>{loaded.source}</code> ({loaded.image.width}×
               {loaded.image.height}). Reveal to look for a hidden message.
             </p>
           }

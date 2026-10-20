@@ -95,6 +95,9 @@ export function bitPlane(data: Uint8ClampedArray): Uint8ClampedArray {
   return out;
 }
 
+const CHANGED_RGB = [212, 255, 58] as const;
+const UNCHANGED_RGB = [12, 10, 20] as const;
+
 /** Highlights every changed channel between two images. */
 export function difference(a: Uint8ClampedArray, b: Uint8ClampedArray): { pixels: Uint8ClampedArray; changed: number } {
   const out = new Uint8ClampedArray(a.length);
@@ -107,9 +110,10 @@ export function difference(a: Uint8ClampedArray, b: Uint8ClampedArray): { pixels
         changed++;
       }
     }
-    out[i] = hit ? 212 : 12;
-    out[i + 1] = hit ? 255 : 10;
-    out[i + 2] = hit ? 58 : 20;
+    const [r, g, bl] = hit ? CHANGED_RGB : UNCHANGED_RGB;
+    out[i] = r;
+    out[i + 1] = g;
+    out[i + 2] = bl;
     out[i + 3] = 255;
   }
   return { pixels: out, changed };

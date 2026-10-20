@@ -1,4 +1,4 @@
-import { deltaE, JND, type Rgb } from "@/lib/colour";
+import { CHANNELS, deltaE, JND, rgbCss, toBits, type Rgb } from "@/lib/colour";
 import styles from "./Explainer.module.css";
 
 /** Three neighbouring sky-blue pixels, the kind a photo is full of. */
@@ -9,11 +9,11 @@ const PIXELS: Rgb[] = [
 ];
 const LETTER = "J";
 const CODE = LETTER.charCodeAt(0);
-const MESSAGE_BITS = CODE.toString(2).padStart(8, "0").split("").map(Number);
+const MESSAGE_BITS = [...toBits(CODE)].map(Number);
 
 interface Slot {
   pixel: number;
-  channel: "R" | "G" | "B";
+  channel: (typeof CHANNELS)[number];
   before: number;
   after: number;
   carried: number | null;
@@ -26,17 +26,18 @@ const SLOTS: Slot[] = PIXELS.flatMap((rgb, pixel) =>
     const carried = MESSAGE_BITS[index] ?? null;
     return {
       pixel,
-      channel: (["R", "G", "B"] as const)[c]!,
+      channel: CHANNELS[c]!,
       before,
       after: carried === null ? before : (before & ~1) | carried,
       carried,
     };
   }),
 );
-const AFTER: Rgb[] = PIXELS.map((_, p) => SLOTS.slice(p * 3, p * 3 + 3).map((s) => s.after) as unknown as Rgb);
+const AFTER: Rgb[] = PIXELS.map((_, p) => {
+  const [r, g, b] = SLOTS.slice(p * 3, p * 3 + 3).map((slot) => slot.after);
+  return [r!, g!, b!];
+});
 const WORST = Math.max(...PIXELS.map((rgb, p) => deltaE(rgb, AFTER[p]!)));
-
-const css = ([r, g, b]: Rgb) => `rgb(${r} ${g} ${b})`;
 
 /** Walks through hiding one letter in three pixels, bit by bit. */
 export function PixelZoom() {
@@ -55,11 +56,11 @@ export function PixelZoom() {
         <div className={styles.zoomStrip} aria-hidden="true">
           <span className={styles.zoomLabel}>before</span>
           {PIXELS.map((rgb, p) => (
-            <span key={p} className={styles.zoomPixel} style={{ background: css(rgb) }} />
+            <span key={p} className={styles.zoomPixel} style={{ background: rgbCss(rgb) }} />
           ))}
           <span className={styles.zoomLabel}>after</span>
           {AFTER.map((rgb, p) => (
-            <span key={p} className={styles.zoomPixel} style={{ background: css(rgb) }} />
+            <span key={p} className={styles.zoomPixel} style={{ background: rgbCss(rgb) }} />
           ))}
         </div>
 
@@ -81,12 +82,12 @@ export function PixelZoom() {
                   <td>{slot.pixel + 1}</td>
                   <td>{slot.channel}</td>
                   <td className={styles.binary}>
-                    {slot.before.toString(2).padStart(8, "0").slice(0, 7)}
+                    {toBits(slot.before).slice(0, 7)}
                     <span data-hit="false">{slot.before & 1}</span>
                   </td>
                   <td>{slot.carried ?? "–"}</td>
                   <td className={styles.binary}>
-                    {slot.after.toString(2).padStart(8, "0").slice(0, 7)}
+                    {toBits(slot.after).slice(0, 7)}
                     <span data-hit={slot.carried !== null}>{slot.after & 1}</span>
                   </td>
                   <td>{slot.after === slot.before ? "0" : slot.after > slot.before ? "+1" : "−1"}</td>

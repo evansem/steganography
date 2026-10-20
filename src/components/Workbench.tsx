@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { FaviconPanel } from "./FaviconPanel";
 import { HidePanel } from "./HidePanel";
 import { RevealPanel } from "./RevealPanel";
@@ -10,7 +10,7 @@ interface Tab {
   id: string;
   label: string;
   blurb: string;
-  render: () => React.ReactNode;
+  render: () => ReactNode;
 }
 
 const TABS: Tab[] = [

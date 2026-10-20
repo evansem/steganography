@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { deltaE, flipBit, JND, type Rgb } from "@/lib/colour";
+import { CHANNELS, deltaE, flipBit, JND, rgbCss, toBits, type Rgb } from "@/lib/colour";
 import styles from "./Explainer.module.css";
 
 const BASE: Rgb = [182, 104, 214];
-const CHANNELS = ["R", "G", "B"] as const;
-
-const css = ([r, g, b]: Rgb) => `rgb(${r} ${g} ${b})`;
-const bits = (value: number) => value.toString(2).padStart(8, "0").split("");
+/** Bit positions from most to least significant. */
+const POSITIONS = [7, 6, 5, 4, 3, 2, 1, 0];
 
 /**
  * Lets the reader flip any one bit of a colour and see, and measure, how much
@@ -28,17 +26,17 @@ export function BitFlip() {
 
       <div className={styles.flipGrid}>
         <div className={styles.swatches}>
-          <div className={styles.swatch} style={{ background: css(BASE) }}>
+          <div className={styles.swatch} style={{ background: rgbCss(BASE) }}>
             <span>original</span>
           </div>
-          <div className={styles.swatch} style={{ background: css(flipped) }}>
+          <div className={styles.swatch} style={{ background: rgbCss(flipped) }}>
             <span>bit {bit} flipped</span>
           </div>
         </div>
 
         <div className={styles.flipBody}>
           <div className={styles.bitPicker} role="radiogroup" aria-label="Bit to flip">
-            {Array.from({ length: 8 }, (_, i) => 7 - i).map((position) => (
+            {POSITIONS.map((position) => (
               <button
                 key={position}
                 type="button"
@@ -60,8 +58,8 @@ export function BitFlip() {
                 <tr key={name}>
                   <th scope="row">{name}</th>
                   <td className={styles.binary} aria-label={`${BASE[c]} becomes ${flipped[c]}`}>
-                    {bits(flipped[c]!).map((value, i) => (
-                      <span key={i} data-hit={7 - i === bit}>
+                    {[...toBits(flipped[c]!)].map((value, i) => (
+                      <span key={i} data-hit={POSITIONS[i] === bit}>
                         {value}
                       </span>
                     ))}
