@@ -62,10 +62,7 @@ export async function embedSealed(
  * Tries both bit depths. A wrong passphrase and "no message" are
  * indistinguishable by design, so both raise {@link NoMessageError}.
  */
-export async function extractSealed(
-  image: ImageLike,
-  passphrase: string,
-): Promise<{ text: string; depth: BitDepth }> {
+export async function extractSealed(image: ImageLike, passphrase: string): Promise<{ text: string; depth: BitDepth }> {
   for (const depth of [1, 2] as const) {
     const { total, saltSlots, scatterSlots } = layout(image, depth);
     const maxFrame = bytesForSlots(scatterSlots, depth);

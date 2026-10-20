@@ -13,8 +13,8 @@ export function Hero() {
 
       <div className={styles.copy}>
         <p className={styles.lede}>
-          Justeg tucks a message into the lowest bits of an image&apos;s pixels. The picture looks the same; the
-          words are there for anyone holding the right key.
+          Justeg tucks a message into the lowest bits of an image&apos;s pixels. The picture looks the same; the words
+          are there for anyone holding the right key.
         </p>
         {/* Hidden ink: only visible under the pointer's blacklight. */}
         <UvInk className={styles.secret}>

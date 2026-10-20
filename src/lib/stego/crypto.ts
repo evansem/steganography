@@ -27,10 +27,7 @@ export async function deriveKeys(passphrase: string, salt: Uint8Array): Promise<
       512,
     ),
   );
-  const aesKey = await crypto.subtle.importKey("raw", bits.slice(0, 32), "AES-GCM", false, [
-    "encrypt",
-    "decrypt",
-  ]);
+  const aesKey = await crypto.subtle.importKey("raw", bits.slice(0, 32), "AES-GCM", false, ["encrypt", "decrypt"]);
   return { aesKey, scatterKey: new Uint32Array(bits.slice(32).buffer) };
 }
 

@@ -47,9 +47,7 @@ export function RevealPanel({ initialImage = null, intro }: Props) {
     } catch (error) {
       setStatus({
         tone: "error",
-        text: passphrase
-          ? friendlyError(error)
-          : `${friendlyError(error)} If it was encrypted, enter the passphrase.`,
+        text: passphrase ? friendlyError(error) : `${friendlyError(error)} If it was encrypted, enter the passphrase.`,
       });
     } finally {
       setBusy(false);

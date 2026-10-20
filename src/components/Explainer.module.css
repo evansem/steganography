@@ -138,7 +138,9 @@
   font-family: var(--font-mono);
   font-size: 13px;
   cursor: pointer;
-  transition: background 0.2s var(--ease), color 0.2s var(--ease);
+  transition:
+    background 0.2s var(--ease),
+    color 0.2s var(--ease);
 }
 
 .bitChoice[data-lsb="true"] {

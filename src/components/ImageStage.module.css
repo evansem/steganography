@@ -118,8 +118,12 @@
 }
 
 @keyframes scan {
-  from { background-position: 0 110%; }
-  to { background-position: 0 -110%; }
+  from {
+    background-position: 0 110%;
+  }
+  to {
+    background-position: 0 -110%;
+  }
 }
 
 .caption {

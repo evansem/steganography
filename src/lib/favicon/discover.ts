@@ -67,5 +67,8 @@ function dedupe(urls: URL[]): URL[] {
 }
 
 function decodeEntities(value: string): string {
-  return value.replace(/&amp;/g, "&").replace(/&quot;/g, '"').replace(/&#39;/g, "'");
+  return value
+    .replace(/&amp;/g, "&")
+    .replace(/&quot;/g, '"')
+    .replace(/&#39;/g, "'");
 }

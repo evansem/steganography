@@ -30,9 +30,7 @@ export function capacity(image: ImageLike, options: HideOptions = {}): number {
 
 export async function hide(image: ImageLike, text: string, options: HideOptions = {}) {
   const depth = options.depth ?? 1;
-  return options.passphrase
-    ? embedSealed(image, text, options.passphrase, depth)
-    : embedPlain(image, text, depth);
+  return options.passphrase ? embedSealed(image, text, options.passphrase, depth) : embedPlain(image, text, depth);
 }
 
 export async function reveal(image: ImageLike, passphrase?: string, options: RevealOptions = {}): Promise<Revealed> {

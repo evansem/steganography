@@ -35,8 +35,8 @@ export function Footer() {
   return (
     <footer className={`container ${styles.footer}`}>
       <p>
-        Justeg · just a simple <strong>steg</strong>anography tool, first written in Python in 2022 and rebuilt
-        for the web.
+        Justeg · just a simple <strong>steg</strong>anography tool, first written in Python in 2022 and rebuilt for the
+        web.
       </p>
       <p>
         <a href={REPO} target="_blank" rel="noreferrer">

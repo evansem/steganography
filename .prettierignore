@@ -1,0 +1,7 @@
+.next/
+coverage/
+legacy/
+public/
+package-lock.json
+*.png
+*.md

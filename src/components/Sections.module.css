@@ -94,7 +94,9 @@
 }
 
 @keyframes flip {
-  50% { background: var(--uv); }
+  50% {
+    background: var(--uv);
+  }
 }
 
 .byteNote {

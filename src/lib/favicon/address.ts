@@ -45,7 +45,7 @@ function isBlockedV6(address: string): boolean {
     (first & 0xffc0) === 0xfe80 || // link-local fe80::/10
     (first & 0xffc0) === 0xfec0 || // site-local (deprecated)
     (first & 0xff00) === 0xff00 || // multicast
-    first === 0x2001 && parseInt(lower.split(":")[1] || "0", 16) === 0x0db8 || // documentation
+    (first === 0x2001 && parseInt(lower.split(":")[1] || "0", 16) === 0x0db8) || // documentation
     first === 0 // other reserved ::/16 forms
   );
 }
