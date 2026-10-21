@@ -18,6 +18,9 @@ const VERSION_OFFSET = MAGIC.length;
 const LENGTH_OFFSET = VERSION_OFFSET + 1;
 const HEADER_BYTES = LENGTH_OFFSET + 4;
 
+/** Bytes the plain container adds in front of the text. */
+export const PLAIN_HEADER_BYTES = HEADER_BYTES;
+
 /** Maximum UTF-8 bytes a plain message can use in this image. */
 export function plainCapacity(image: ImageLike, depth: BitDepth): number {
   return Math.max(0, bytesForSlots(slotCount(image), depth) - HEADER_BYTES);

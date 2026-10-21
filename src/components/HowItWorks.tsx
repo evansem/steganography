@@ -1,6 +1,7 @@
 import { BitFlip } from "./BitFlip";
 import { ContainerMap } from "./ContainerMap";
 import explainer from "./Explainer.module.css";
+import { FaviconPlane } from "./FaviconPlane";
 import { Pipeline } from "./Pipeline";
 import { PixelZoom } from "./PixelZoom";
 import styles from "./Sections.module.css";
@@ -67,10 +68,18 @@ export function HowItWorks() {
         <h3 className={explainer.subhead}>What happens when you press Hide</h3>
         <Pipeline />
         <ContainerMap />
+
+        <h3 className={explainer.subhead}>Invisible, not undetectable</h3>
         <p className={explainer.intro}>
-          The change is invisible, not undetectable. Open the <a href="#lab">lab</a>, load an image and switch to{" "}
-          <strong>Bit plane</strong>: a plain message shows up as a band of noise along the top, while an encrypted one
-          is spread across the whole picture.
+          The eye judges a whole colour value; a forensic view can isolate the one bit Justeg changed. The{" "}
+          <strong>bit plane</strong> shows only the lowest bit of every channel, and that is where a message shows
+          itself.
+        </p>
+        <FaviconPlane />
+        <p className={explainer.intro}>
+          Try it on your own images: open the <a href="#lab">lab</a>, load a picture and switch to{" "}
+          <strong>Bit plane</strong>. A plain message shows up as a band along the top, while an encrypted one is spread
+          across the whole picture.
         </p>
       </div>
     </section>

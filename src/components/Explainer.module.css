@@ -373,3 +373,85 @@
   border: 1px solid var(--glow);
   color: var(--paper);
 }
+
+/* ---- Favicon bit plane ------------------------------------------------ */
+
+.planeLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+  gap: clamp(18px, 3vw, 32px);
+  align-items: start;
+}
+
+@media (max-width: 760px) {
+  .planeLayout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.planeGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.planeCell {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.planeFrame {
+  position: relative;
+  border: 1px solid var(--line-strong);
+}
+
+.planeCanvas {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  image-rendering: pixelated;
+}
+
+/* rows that hold the message, in the "after" bit plane */
+.planeBand {
+  position: absolute;
+  inset: -1px -1px auto;
+  border: 1px solid var(--glow);
+  pointer-events: none;
+}
+
+.planeLabel {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--faint);
+}
+
+.planeSwatch {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  vertical-align: middle;
+  border: 1px solid var(--line-strong);
+}
+
+.planeHead {
+  margin: 24px 0 10px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.planeReasons {
+  display: grid;
+  gap: 10px;
+  max-width: 76ch;
+  margin: 0;
+  padding-left: 18px;
+  color: var(--muted);
+  font-size: 15px;
+}
+
+.planeReasons strong {
+  color: var(--paper);
+}
