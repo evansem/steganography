@@ -12,8 +12,7 @@
 }
 
 .views {
-  composes: dissolve from "./Edges.module.css";
-  --p: 2px;
+  composes: line from "./Edges.module.css";
   --edge: var(--line);
   --fill: var(--ink-3);
   display: inline-flex;
@@ -22,8 +21,7 @@
 }
 
 .view {
-  composes: dissolve from "./Edges.module.css";
-  --p: 2px;
+  composes: line from "./Edges.module.css";
   --edge: transparent;
   --fill: transparent;
   padding: 6px 14px;
@@ -53,8 +51,7 @@
 }
 
 .clear {
-  composes: dissolve from "./Edges.module.css";
-  --p: 2px;
+  composes: line from "./Edges.module.css";
   --fill: var(--ink-2);
   width: 32px;
   height: 32px;
@@ -70,8 +67,7 @@
 }
 
 .frame {
-  composes: dissolve from "./Edges.module.css";
-  --p: var(--dither-lg);
+  composes: line from "./Edges.module.css";
   --edge: var(--line);
   --fill-image: repeating-conic-gradient(var(--ink-3) 0 25%, var(--ink-2) 0 50%) 0 0 / 20px 20px;
   position: relative;

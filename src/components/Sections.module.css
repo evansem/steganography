@@ -115,16 +115,15 @@
 }
 
 .step {
-  composes: dissolve from "./Edges.module.css";
+  composes: line from "./Edges.module.css";
 }
 
 .tile {
-  composes: dissolve from "./Edges.module.css";
+  composes: line from "./Edges.module.css";
 }
 
 .step,
 .tile {
-  --p: var(--dither-lg);
   --edge: var(--line);
   --fill: var(--ink-2);
   padding: 24px;

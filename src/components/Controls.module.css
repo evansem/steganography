@@ -43,11 +43,11 @@
 }
 
 .input {
-  composes: dissolve from "./Edges.module.css";
+  composes: line from "./Edges.module.css";
 }
 
 .textarea {
-  composes: dissolve from "./Edges.module.css";
+  composes: line from "./Edges.module.css";
 }
 
 .input,
@@ -56,12 +56,12 @@
   padding: 14px 16px;
 }
 
-/* the edge pixels light up, and a ring is drawn on the solid core */
+/* the line lights up and thickens to 2px */
 .input:focus,
 .textarea:focus {
   --edge: var(--uv);
   outline: 1px solid var(--uv);
-  outline-offset: -10px;
+  outline-offset: -2px;
 }
 
 .textarea {
@@ -78,8 +78,7 @@
 }
 
 .segmented {
-  composes: dissolve from "./Edges.module.css";
-  --p: 2px;
+  composes: line from "./Edges.module.css";
   --edge: var(--line);
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -88,8 +87,7 @@
 }
 
 .segment {
-  composes: dissolve from "./Edges.module.css";
-  --p: 2px;
+  composes: line from "./Edges.module.css";
   --edge: transparent;
   --fill: transparent;
   display: grid;
@@ -110,7 +108,7 @@
 }
 
 .switch {
-  composes: dissolve from "./Edges.module.css";
+  composes: line from "./Edges.module.css";
   --edge: var(--line);
   display: flex;
   align-items: center;
@@ -211,8 +209,7 @@
 }
 
 .primary {
-  composes: dissolve from "./Edges.module.css";
-  --p: 4px;
+  composes: line from "./Edges.module.css";
   --edge: var(--glow);
   --fill: var(--glow);
   color: var(--ink);
@@ -229,8 +226,7 @@
 }
 
 .secondary {
-  composes: dissolve from "./Edges.module.css";
-  --p: 4px;
+  composes: line from "./Edges.module.css";
   --fill: var(--ink-2);
 }
 
@@ -276,8 +272,7 @@
 }
 
 .output {
-  composes: dissolve from "./Edges.module.css";
-  --p: var(--dither-lg);
+  composes: line from "./Edges.module.css";
   --edge: rgb(var(--glow-rgb) / 0.4);
   --fill-image:
     radial-gradient(400px circle at 0 0, var(--glow-soft), transparent 70%), linear-gradient(var(--ink) 0 0);

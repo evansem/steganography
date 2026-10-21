@@ -1,15 +1,11 @@
 /* ==========================================================================
    Justeg design tokens. The look is "blacklight": ink-dark surfaces, soft
    lavender light, and pale mint ink that only shows where the light falls.
-   Edges dissolve into pixels, never round: see components/Edges.module.css.
+   Corners stay square: see components/Edges.module.css.
    ========================================================================== */
 
 /* Edge knobs for components/Edges.module.css. Non-inherited, so each element
    only gets the edge it asks for. */
-@property --p {
-  syntax: "*";
-  inherits: false;
-}
 @property --edge {
   syntax: "*";
   inherits: false;
@@ -56,9 +52,7 @@
   --font-mono: "Geist Mono Variable", ui-monospace, monospace;
   --display-weight: 800;
 
-  /* edge pixel sizes */
-  --dither: 4px;
-  --dither-lg: 4px;
+  /* stepped-corner size for .pixel */
   --pixel: 3px;
   --gutter: clamp(16px, 4vw, 48px);
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
