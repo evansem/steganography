@@ -7,43 +7,10 @@
  */
 import { writeFileSync } from "node:fs";
 import { crc32, deflateSync } from "node:zlib";
-import { embedPlain, extractPlain } from "../src/lib/stego/plain";
+import { EGG_MESSAGE, EGG_SIZE, eggIcon } from "../src/lib/egg-icon";
+import { extractPlain } from "../src/lib/stego/plain";
 
-const SIZE = 64;
 const PNG_SIGNATURE = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
-const MESSAGE = "🥚 You found the egg! This favicon was written by Justeg. Now hide something of your own.";
-
-/** Linear interpolation between two colours. */
-function lerp(a: number[], b: number[], t: number): number[] {
-  return a.map((v, i) => Math.round(v + (b[i]! - v) * t));
-}
-
-function render(): Uint8ClampedArray {
-  const data = new Uint8ClampedArray(SIZE * SIZE * 4);
-  const ink = [7, 6, 11];
-  const white = [255, 255, 255];
-  const glow = [178, 240, 206];
-  const uv = [184, 164, 255];
-
-  for (let y = 0; y < SIZE; y++) {
-    for (let x = 0; x < SIZE; x++) {
-      // Egg: an ellipse whose top half is narrower than its bottom half.
-      const nx = (x + 0.5 - 32) / 19;
-      const ny = (y + 0.5 - 37) / (y < 37 ? 29 : 19);
-      const squeeze = y < 37 ? 1 + 0.25 * Math.abs(ny) : 1;
-      const inside = (nx * squeeze) ** 2 + ny ** 2 <= 1;
-
-      let colour = ink;
-      if (inside) {
-        const d = Math.hypot(x - 24, y - 22) / 40;
-        colour = d < 0.25 ? lerp(white, glow, d / 0.25) : lerp(glow, uv, Math.min(1, (d - 0.25) / 0.75));
-      }
-      const i = (y * SIZE + x) * 4;
-      data.set([...colour, 255], i);
-    }
-  }
-  return data;
-}
 
 /** Minimal RGBA PNG encoder, so the script needs no image library. */
 function png(pixels: Uint8ClampedArray, width: number, height: number): Buffer {
@@ -74,8 +41,9 @@ function png(pixels: Uint8ClampedArray, width: number, height: number): Buffer {
   ]);
 }
 
-const image = { data: render(), width: SIZE, height: SIZE };
-const stego = embedPlain(image, MESSAGE, 1);
-if (extractPlain({ ...image, data: stego }).text !== MESSAGE) throw new Error("Round trip failed.");
-writeFileSync(new URL("../src/app/icon.png", import.meta.url), png(stego, SIZE, SIZE));
+const { stego } = eggIcon();
+if (extractPlain({ data: stego, width: EGG_SIZE, height: EGG_SIZE }).text !== EGG_MESSAGE) {
+  throw new Error("Round trip failed.");
+}
+writeFileSync(new URL("../src/app/icon.png", import.meta.url), png(stego, EGG_SIZE, EGG_SIZE));
 console.log("Wrote src/app/icon.png with a hidden message.");
