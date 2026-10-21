@@ -5,6 +5,7 @@ import "@fontsource/instrument-serif/400-italic.css";
 import "@fontsource-variable/space-grotesk";
 import "@fontsource-variable/jetbrains-mono";
 import "./globals.css";
+import "./dither.css";
 
 export const metadata: Metadata = {
   title: "Justeg · hide words in plain sight",
