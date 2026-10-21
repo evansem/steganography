@@ -5,8 +5,8 @@
               dither (25% -> 50% -> 75% -> solid), so a panel fades into
               the page one pixel cell at a time, like a low-bit image.
    .halo      wrappers around large surfaces: a field of square dots that
-              thins out over eight bands, dense at the surface and sparse
-              at the far edge, and twinkles slowly.
+              thins out over eight bands from the surface, and twinkles
+              slowly.
    .pixel     small chips (bits, badges): corners stepped out one pixel.
    .brackets  anything that frames an image: viewfinder ticks on the corners.
 
@@ -88,11 +88,12 @@
 }
 
 /*
- * --halo-p  size of one dot cell (default 4px)
- * --halo    paint for the dots; a gradient works
+ * --halo-p     size of one dot cell (default 4px)
+ * --halo-band  width of one density band, in cells (default 2)
+ * --halo       paint for the dots; a gradient works
  *
- * The halo sits behind the surface and reaches 8 cells past it. With D(n)
- * the n-th dot tile (sparse to dense) and R(k) the halo inset by k cells:
+ * The halo sits behind the surface and reaches 8 bands past it. With D(n)
+ * the n-th dot tile (sparse to dense) and R(k) the halo inset by k bands:
  *   D1 + (D2 + (... + (D7 + D8 n R7) ...) n R2) n R1
  * so each band shows one density, and the densest runs on under the surface,
  * where the surface's own dissolved edge lets it show through.
@@ -109,17 +110,18 @@
 .halo::before,
 .halo::after {
   --_p: var(--halo-p, 4px);
+  --_b: calc(var(--_p) * var(--halo-band, 2));
   --_t: calc(var(--_p) * 16);
   --_o: 0 0;
 
   content: "";
   position: absolute;
-  inset: calc(-8 * var(--_p));
+  inset: calc(-8 * var(--_b));
   z-index: -1;
   pointer-events: none;
   background: var(--halo, var(--line-strong));
   will-change: opacity;
-  animation: twinkle 9s ease-in-out infinite alternate;
+  animation: twinkle 12s ease-in-out infinite alternate;
   -webkit-mask-image:
     var(--dots-1), linear-gradient(#000 0 0), var(--dots-2), linear-gradient(#000 0 0), var(--dots-3),
     linear-gradient(#000 0 0), var(--dots-4), linear-gradient(#000 0 0), var(--dots-5), linear-gradient(#000 0 0),
@@ -130,35 +132,35 @@
     var(--dots-6), linear-gradient(#000 0 0), var(--dots-7), linear-gradient(#000 0 0), var(--dots-8);
   -webkit-mask-size:
     var(--_t) var(--_t),
-    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    calc(100% - 2 * var(--_b)) calc(100% - 2 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    calc(100% - 4 * var(--_b)) calc(100% - 4 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p)),
+    calc(100% - 6 * var(--_b)) calc(100% - 6 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 8 * var(--_p)) calc(100% - 8 * var(--_p)),
+    calc(100% - 8 * var(--_b)) calc(100% - 8 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 10 * var(--_p)) calc(100% - 10 * var(--_p)),
+    calc(100% - 10 * var(--_b)) calc(100% - 10 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 12 * var(--_p)) calc(100% - 12 * var(--_p)),
+    calc(100% - 12 * var(--_b)) calc(100% - 12 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 14 * var(--_p)) calc(100% - 14 * var(--_p)),
+    calc(100% - 14 * var(--_b)) calc(100% - 14 * var(--_b)),
     var(--_t) var(--_t);
   mask-size:
     var(--_t) var(--_t),
-    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    calc(100% - 2 * var(--_b)) calc(100% - 2 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    calc(100% - 4 * var(--_b)) calc(100% - 4 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p)),
+    calc(100% - 6 * var(--_b)) calc(100% - 6 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 8 * var(--_p)) calc(100% - 8 * var(--_p)),
+    calc(100% - 8 * var(--_b)) calc(100% - 8 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 10 * var(--_p)) calc(100% - 10 * var(--_p)),
+    calc(100% - 10 * var(--_b)) calc(100% - 10 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 12 * var(--_p)) calc(100% - 12 * var(--_p)),
+    calc(100% - 12 * var(--_b)) calc(100% - 12 * var(--_b)),
     var(--_t) var(--_t),
-    calc(100% - 14 * var(--_p)) calc(100% - 14 * var(--_p)),
+    calc(100% - 14 * var(--_b)) calc(100% - 14 * var(--_b)),
     var(--_t) var(--_t);
   -webkit-mask-position:
     var(--_o), center, var(--_o), center, var(--_o), center, var(--_o), center, var(--_o), center, var(--_o), center,
@@ -181,22 +183,23 @@
 
 .halo::after {
   --_o: calc(8 * var(--_p)) calc(5 * var(--_p));
-  animation-duration: 13s;
-  animation-delay: -6s;
+  animation-duration: 17s;
+  animation-delay: -8s;
 }
 
 @keyframes twinkle {
   from {
-    opacity: 0.2;
+    opacity: 0.35;
   }
   to {
-    opacity: 1;
+    opacity: 0.9;
   }
 }
 
 @media (max-width: 640px) {
   .halo {
     --halo-p: 2px;
+    --halo-band: 1;
   }
 }
 

@@ -14,8 +14,8 @@ import { writeFileSync } from "node:fs";
 const CELLS = 16;
 const SEED = 0x5eed;
 
-/** Outer band to inner band. Eased so the sparse end lingers, as in a long dissolve. */
-const HALO_LEVELS = [0.03, 0.07, 0.13, 0.21, 0.31, 0.44, 0.6, 0.78];
+/** Outer band to inner band. Kept sparse, so the field reads as scattered light, not a border. */
+const HALO_LEVELS = [0.015, 0.03, 0.05, 0.075, 0.105, 0.14, 0.185, 0.24];
 
 /** mulberry32: small, seedable, good enough for a dither map. */
 function random(seed: number): () => number {

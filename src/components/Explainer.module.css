@@ -9,7 +9,7 @@
 .subhead {
   margin: 24px 0 0;
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--display-weight);
   font-size: clamp(26px, 3.4vw, 38px);
   line-height: 1.1;
 }

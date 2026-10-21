@@ -5,15 +5,15 @@
 
 .title {
   font-family: var(--font-display);
-  font-weight: 400;
-  font-size: clamp(64px, 13vw, 168px);
-  line-height: 0.86;
-  letter-spacing: -0.03em;
+  font-weight: var(--display-weight);
+  font-size: clamp(56px, 12vw, 152px);
+  line-height: 0.9;
+  letter-spacing: -0.04em;
   margin: 18px 0 0;
 }
 
 .title em {
-  font-style: italic;
+  font-style: normal;
   color: var(--glow);
   text-shadow: 0 0 48px rgb(var(--glow-rgb) / 0.25);
 }

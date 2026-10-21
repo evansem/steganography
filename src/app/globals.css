@@ -50,9 +50,11 @@
   --glow-soft: rgb(var(--glow-rgb) / 0.12);
   --danger: rgb(var(--danger-rgb));
 
-  --font-display: "Instrument Serif", ui-serif, Georgia, serif;
-  --font-ui: "Space Grotesk Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-mono: "JetBrains Mono Variable", ui-monospace, monospace;
+  /* Display type is a dot matrix, set in the same square dots as the edges. */
+  --font-display: "Doto Variable", ui-monospace, monospace;
+  --font-ui: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, monospace;
+  --display-weight: 800;
 
   /* edge pixel sizes */
   --dither: 3px;
@@ -139,14 +141,15 @@ textarea {
 
 .section-title {
   font-family: var(--font-display);
-  font-weight: 400;
+  font-weight: var(--display-weight);
   font-size: clamp(36px, 5vw, 60px);
   line-height: 1.02;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin: 12px 0 0;
 }
 
 .section-title em {
+  font-style: normal;
   color: var(--glow);
 }
 

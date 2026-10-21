@@ -1,9 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
-import "@fontsource/instrument-serif/400.css";
-import "@fontsource/instrument-serif/400-italic.css";
-import "@fontsource-variable/space-grotesk";
-import "@fontsource-variable/jetbrains-mono";
+import "@fontsource-variable/doto";
+import "@fontsource-variable/geist";
+import "@fontsource-variable/geist-mono";
 import "./globals.css";
 import "./dither.css";
 
