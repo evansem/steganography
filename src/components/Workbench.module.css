@@ -9,7 +9,8 @@
   align-items: end;
   justify-content: space-between;
   gap: 16px 32px;
-  margin-bottom: 28px;
+  /* clear the halo, which reaches 64px past the card (16px on phones) */
+  margin-bottom: 72px;
 }
 
 .local {
@@ -40,7 +41,7 @@
 /* A dot field fades out from the card, in the same lavender-to-mint light. */
 .frame {
   composes: halo from "./Edges.module.css";
-  --halo: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.55), rgb(var(--uv-rgb) / 0.2) 40%, rgb(var(--glow-rgb) / 0.4));
+  --halo: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.4), rgb(var(--uv-rgb) / 0.16) 45%, rgb(var(--glow-rgb) / 0.3));
 }
 
 /* The dithered edge carries a gradient: lavender in, mint out. */
@@ -106,8 +107,9 @@
 }
 
 .tabLabel {
-  font-family: var(--font-display);
-  font-size: clamp(24px, 3vw, 32px);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 500;
+  letter-spacing: -0.01em;
   line-height: 1;
 }
 
@@ -124,4 +126,10 @@
 
 .panel {
   padding: clamp(16px, 3vw, 32px);
+}
+
+@media (max-width: 640px) {
+  .head {
+    margin-bottom: 28px;
+  }
 }
