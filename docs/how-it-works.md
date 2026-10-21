@@ -131,6 +131,30 @@ In the plain container every field is written in order from the first pixel. In 
 
 Load any image in the app and switch the preview to **Bit plane**. It paints every LSB as full black or full colour. A natural photo looks like static. After hiding a plain message, a band of different-looking noise appears along the top rows, where the message was written in order. After hiding an encrypted message, the change is spread evenly across the whole image and the band is gone. The **Changes** view marks every channel that the encoder modified.
 
+### A real example: the favicon
+
+Justeg's 64×64 favicon carries a plain message (an Easter egg, written by `npm run icon`). The bit planes below are from the favicon before and after embedding, built by the same code the app uses; the app's "How it works" section draws the same figure live.
+
+![Lowest-bit planes of the favicon before (left) and after (right) embedding: a solid magenta background, with a band of noise across the top rows after embedding](images/favicon-bit-planes.png)
+
+The two favicons look identical, yet the bit plane shows the message plainly. Four effects explain the difference:
+
+1. **The bit plane amplifies one step to the full range.** It discards bits 7 to 1 and maps bit 0 to 0 or 255. A ±1 change, 0.4% of a channel's range, becomes the largest contrast a screen can show.
+2. **Flat colour has uniform LSBs.** The background is `rgb(7, 6, 11)` everywhere. Its LSBs are 1, 0, 1 (red and blue on, green off), so the background's plane is one solid magenta.
+3. **Message bits look random.** The 100-byte frame (9-byte header and 91 bytes of UTF-8) becomes 800 bits, one per channel, written in order from the top-left: 267 pixels, just over four rows. A channel changes only where a message bit disagrees with the existing LSB, which happens 389 times out of 800. Those changes have no spatial pattern, so the uniform magenta breaks into noise.
+4. **Texture hides it.** Inside the egg the plane is busy before and after. The gradient already moves neighbouring pixels by a step or two, so their LSBs are naturally noisy and bits written there would blend in.
+
+The first pixel shows both views at once:
+
+| Pixel 1 | R | G | B | Bit plane | ΔE |
+|---|---|---|---|---|---:|
+| Before | `0000011`**`1`** | `0000011`**`0`** | `0000101`**`1`** | magenta | |
+| After | `0000011`**`0`** | `0000011`**`1`** | `0000101`**`0`** | green | 1.00 |
+
+In the image the pixel moves from `rgb(7, 6, 11)` to `rgb(6, 7, 10)`, a ΔE of 1.00, well below the 2.3 threshold. In the bit plane every channel flips between 0 and 255.
+
+The favicon is close to the worst case for LSB steganography: a flat, synthetic cover written in order. A photograph has noisy LSBs everywhere, and a passphrase scatters the bits across the whole image, so neither leaves a band. Statistical tests can still detect the change; see the [threat model](threat-model.md).
+
 ## 8. Compatibility with the 2022 prototype
 
 The original Python tool worked on binary Netpbm files (`P6` rasters with a `.pbm` extension). It stored 7-bit ASCII in the two lowest bits of every byte, starting at the first pixel, and ended the message with the EOT control character. Justeg reads and writes Netpbm, and when a Netpbm image holds no current-format message it falls back to that legacy format, so the prototype's sample images in [`legacy/python/sample_images`](../legacy/python/sample_images) still reveal their messages. New messages are always written in the current format. See [ADR 0005](adr/0005-netpbm-and-legacy-reader.md).
