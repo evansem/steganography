@@ -1,120 +1,30 @@
 /* ==========================================================================
-   Edge treatments. Justeg never rounds a corner. Edges are made of pixels:
+   Edge treatments. Justeg never rounds a corner.
 
-   .dissolve  surfaces and controls: the edge breaks up into an ordered
-              dither in six even steps, so a panel fades into the page
-              one pixel cell at a time, like a low-bit image.
+   .line      surfaces and controls: a plain 1px line, square corners.
    .halo      wrappers around large surfaces: a field of square dots that
               thins out over eight bands from the surface, and twinkles
               slowly.
    .pixel     small chips (bits, badges): corners stepped out one pixel.
    .brackets  anything that frames an image: viewfinder ticks on the corners.
 
-   Compose them from a component module (`composes: dissolve from "./Edges.module.css"`)
-   and tune with the custom properties below. --p, --edge, --edge-image,
-   --fill and --fill-image are registered as non-inherited in globals.css,
-   so a dithered control inside a dithered card does not pick up the
-   card's settings.
+   Compose them from a component module (`composes: line from "./Edges.module.css"`)
+   and tune with the custom properties below. --edge, --edge-image, --fill
+   and --fill-image are registered as non-inherited in globals.css, so a
+   control inside a card does not pick up the card's settings.
    ========================================================================== */
 
 /*
- * --p      width of the fade is three times --p (default --dither); keep it
- *          a multiple of 2px so the half-size dither cells land on pixels
- * --edge   colour of the outer bands, the "glow" pixels
- * --fill   colour of the surface; --fill-image / --edge-image take images
- *
- * The edge fades over six bands, each one dither cell (--p / 2) wide. The
- * mask is built bottom-up with mask-composite. With R(k) a rectangle inset
- * by k cells and F(n) the n-th ordered-dither tile (n/7 coverage):
- *   F1 + (F2 + (... + (F6 + R6) n R5 ...) n R2) n R1
- * so each band shows one density and the core inside R6 is solid. The Bayer tiles are nested
- * and share one origin, so the bands line up cell for cell.
+ * --edge   colour of the line; --edge-image takes a gradient
+ * --fill   colour of the surface; --fill-image takes an image
  */
-.dissolve {
-  --_p: var(--p, var(--dither));
-  --_c: calc(var(--_p) / 2);
-  --_t: calc(var(--_c) * 8);
+.line {
   --_e: var(--edge, var(--line-strong));
   --_f: var(--fill, var(--ink));
 
-  border: 0;
-  background:
-    var(--fill-image, linear-gradient(var(--_f) 0 0)) center / calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p))
-      no-repeat,
-    var(--edge-image, linear-gradient(var(--_e) 0 0));
-  -webkit-mask-image:
-    var(--fade-1), linear-gradient(#000 0 0), var(--fade-2), linear-gradient(#000 0 0), var(--fade-3),
-    linear-gradient(#000 0 0), var(--fade-4), linear-gradient(#000 0 0), var(--fade-5), linear-gradient(#000 0 0),
-    var(--fade-6), linear-gradient(#000 0 0);
-  mask-image:
-    var(--fade-1), linear-gradient(#000 0 0), var(--fade-2), linear-gradient(#000 0 0), var(--fade-3),
-    linear-gradient(#000 0 0), var(--fade-4), linear-gradient(#000 0 0), var(--fade-5), linear-gradient(#000 0 0),
-    var(--fade-6), linear-gradient(#000 0 0);
-  -webkit-mask-size:
-    var(--_t) var(--_t),
-    calc(100% - 2 * var(--_c)) calc(100% - 2 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 4 * var(--_c)) calc(100% - 4 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 6 * var(--_c)) calc(100% - 6 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 8 * var(--_c)) calc(100% - 8 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 10 * var(--_c)) calc(100% - 10 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 12 * var(--_c)) calc(100% - 12 * var(--_c));
-  mask-size:
-    var(--_t) var(--_t),
-    calc(100% - 2 * var(--_c)) calc(100% - 2 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 4 * var(--_c)) calc(100% - 4 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 6 * var(--_c)) calc(100% - 6 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 8 * var(--_c)) calc(100% - 8 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 10 * var(--_c)) calc(100% - 10 * var(--_c)),
-    var(--_t) var(--_t),
-    calc(100% - 12 * var(--_c)) calc(100% - 12 * var(--_c));
-  -webkit-mask-position:
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center;
-  mask-position:
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center,
-    0 0,
-    center;
-  -webkit-mask-repeat:
-    repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
-  mask-repeat:
-    repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
-  -webkit-mask-composite:
-    source-over, source-in, source-over, source-in, source-over, source-in, source-over, source-in, source-over,
-    source-in, source-over, source-over;
-  mask-composite: add, intersect, add, intersect, add, intersect, add, intersect, add, intersect, add, add;
-}
-
-/* the mask would hide an outside focus ring, so draw it on the solid core */
-.dissolve:focus-visible {
-  outline-offset: calc(-3 * var(--_p) - 3px);
+  border: 1px solid var(--_e);
+  border-image: var(--edge-image, linear-gradient(var(--_e) 0 0)) 1;
+  background: var(--fill-image, linear-gradient(var(--_f) 0 0));
 }
 
 /*
@@ -125,8 +35,8 @@
  * The halo sits behind the surface and reaches 8 bands past it. With D(n)
  * the n-th dot tile (sparse to dense) and R(k) the halo inset by k bands:
  *   D1 + (D2 + (... + (D7 + D8 n R7) ...) n R2) n R1
- * so each band shows one density, and the densest runs on under the surface,
- * where the surface's own dissolved edge lets it show through.
+ * so each band shows one density, and the densest runs on under the surface
+ * so the field meets its edge without a gap.
  *
  * ::before and ::after paint the same bands from two different spots in the
  * tile and fade in and out of step, so dots light up and go dark slowly.

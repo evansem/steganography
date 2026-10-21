@@ -44,10 +44,9 @@
   --halo: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.4), rgb(var(--uv-rgb) / 0.16) 45%, rgb(var(--glow-rgb) / 0.3));
 }
 
-/* The dithered edge carries a gradient: lavender in, mint out. */
+/* The edge line carries a gradient: lavender in, mint out. */
 .card {
-  composes: dissolve from "./Edges.module.css";
-  --p: 4px;
+  composes: line from "./Edges.module.css";
   --edge: rgb(var(--uv-rgb) / 0.6);
   --edge-image: linear-gradient(
     135deg,
