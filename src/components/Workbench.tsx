@@ -36,45 +36,47 @@ export function Workbench() {
         </p>
       </div>
 
-      <div className={styles.card}>
-        <div className={styles.tabs} role="tablist" aria-label="Mode">
+      <div className={styles.frame}>
+        <div className={styles.card}>
+          <div className={styles.tabs} role="tablist" aria-label="Mode">
+            {TABS.map((tab) => (
+              <button
+                key={tab.id}
+                id={`tab-${tab.id}`}
+                type="button"
+                role="tab"
+                aria-selected={active === tab.id}
+                aria-controls={`panel-${tab.id}`}
+                tabIndex={active === tab.id ? 0 : -1}
+                className={styles.tab}
+                onClick={() => setActive(tab.id)}
+                onKeyDown={(event) => {
+                  if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
+                  const index = TABS.findIndex((t) => t.id === active);
+                  const next = TABS[(index + (event.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length]!;
+                  setActive(next.id);
+                  document.getElementById(`tab-${next.id}`)?.focus();
+                }}
+              >
+                <span className={styles.tabLabel}>{tab.label}</span>
+                <span className={styles.tabBlurb}>{tab.blurb}</span>
+              </button>
+            ))}
+          </div>
+
           {TABS.map((tab) => (
-            <button
+            <div
               key={tab.id}
-              id={`tab-${tab.id}`}
-              type="button"
-              role="tab"
-              aria-selected={active === tab.id}
-              aria-controls={`panel-${tab.id}`}
-              tabIndex={active === tab.id ? 0 : -1}
-              className={styles.tab}
-              onClick={() => setActive(tab.id)}
-              onKeyDown={(event) => {
-                if (event.key !== "ArrowRight" && event.key !== "ArrowLeft") return;
-                const index = TABS.findIndex((t) => t.id === active);
-                const next = TABS[(index + (event.key === "ArrowRight" ? 1 : TABS.length - 1)) % TABS.length]!;
-                setActive(next.id);
-                document.getElementById(`tab-${next.id}`)?.focus();
-              }}
+              id={`panel-${tab.id}`}
+              role="tabpanel"
+              aria-labelledby={`tab-${tab.id}`}
+              hidden={active !== tab.id}
+              className={styles.panel}
             >
-              <span className={styles.tabLabel}>{tab.label}</span>
-              <span className={styles.tabBlurb}>{tab.blurb}</span>
-            </button>
+              {tab.render()}
+            </div>
           ))}
         </div>
-
-        {TABS.map((tab) => (
-          <div
-            key={tab.id}
-            id={`panel-${tab.id}`}
-            role="tabpanel"
-            aria-labelledby={`tab-${tab.id}`}
-            hidden={active !== tab.id}
-            className={styles.panel}
-          >
-            {tab.render()}
-          </div>
-        ))}
       </div>
     </section>
   );

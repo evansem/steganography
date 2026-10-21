@@ -37,6 +37,12 @@
   }
 }
 
+/* A dot field fades out from the card, in the same lavender-to-mint light. */
+.frame {
+  composes: halo from "./Edges.module.css";
+  --halo: linear-gradient(135deg, rgb(var(--uv-rgb) / 0.55), rgb(var(--uv-rgb) / 0.2) 40%, rgb(var(--glow-rgb) / 0.4));
+}
+
 /* The dithered edge carries a gradient: lavender in, mint out. */
 .card {
   composes: dissolve from "./Edges.module.css";
