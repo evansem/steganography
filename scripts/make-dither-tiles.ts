@@ -1,18 +1,24 @@
 /**
- * Generates src/app/dither.css: the dot tiles behind the .halo edge in
+ * Generates src/app/dither.css: the mask tiles behind the pixel edges in
  * src/components/Edges.module.css.
  *
- * Every tile is a 16 x 16 cell SVG cut from one random threshold map, so a
- * tile at a higher density always contains every cell of the tiles below it.
- * That nesting is what lets the bands line up cell for cell. Each cell holds
- * a square dot three quarters wide, so the field reads as a grid of dots.
+ *   --fade-1 ... 6  8 x 8 Bayer (ordered) tiles of solid cells, for the
+ *                   .dissolve edge: an even, regular fade
+ *   --dots-1 ... 8  16 x 16 random tiles of square dots three quarters wide,
+ *                   for the .halo field
+ *
+ * Each set is cut from one threshold map, so a tile at a higher density
+ * always contains every cell of the tiles below it. That nesting is what
+ * lets the bands line up cell for cell.
  *
  *   npm run dither
  */
 import { writeFileSync } from "node:fs";
 
-const CELLS = 16;
 const SEED = 0x5eed;
+
+/** Outer band to inner band: six even steps between empty and solid. */
+const FADE_LEVELS = [1, 2, 3, 4, 5, 6].map((n) => n / 7);
 
 /** Outer band to inner band. Kept sparse, so the field reads as scattered light, not a border. */
 const HALO_LEVELS = [0.015, 0.03, 0.05, 0.075, 0.105, 0.14, 0.185, 0.24];
@@ -28,10 +34,10 @@ function random(seed: number): () => number {
   };
 }
 
-/** A random rank for every cell: cell i is lit at density d when rank[i] < d * CELLS^2. */
-function thresholdMap(): number[] {
+/** A random rank for every cell: cell i is lit at density d when rank[i] < d * cells^2. */
+function randomMap(cells: number): number[] {
   const next = random(SEED);
-  const order = Array.from({ length: CELLS * CELLS }, (_, i) => i);
+  const order = Array.from({ length: cells * cells }, (_, i) => i);
   for (let i = order.length - 1; i > 0; i--) {
     const j = Math.floor(next() * (i + 1));
     [order[i], order[j]] = [order[j]!, order[i]!];
@@ -41,32 +47,49 @@ function thresholdMap(): number[] {
   return rank;
 }
 
+/** The classic recursive Bayer matrix, `cells` a power of two, as ranks. */
+function bayerMap(cells: number): number[] {
+  let m = [[0]];
+  while (m.length < cells) {
+    const n = m.length;
+    m = Array.from({ length: n * 2 }, (_, y) =>
+      Array.from({ length: n * 2 }, (_, x) => 4 * m[y % n]![x % n]! + [0, 2, 3, 1][(y < n ? 0 : 2) + (x < n ? 0 : 1)]!),
+    );
+  }
+  return m.flat();
+}
+
 /**
  * One tile as a data URI. Each cell is `unit` wide and its dot `dot` wide;
  * dots are drawn as one path with relative moves to keep the URI short.
  */
 function tile(rank: number[], density: number, unit: number, dot: number): string {
+  const cells = Math.sqrt(rank.length);
   const lit = Math.round(density * rank.length);
   let path = "";
   let px = 0;
   let py = 0;
   rank.forEach((r, i) => {
     if (r >= lit) return;
-    const x = (i % CELLS) * unit;
-    const y = Math.floor(i / CELLS) * unit;
+    const x = (i % cells) * unit;
+    const y = Math.floor(i / cells) * unit;
     path += `m${x - px} ${y - py}h${dot}v${dot}h-${dot}z`;
     px = x;
     py = y;
   });
-  const size = CELLS * unit;
+  const size = cells * unit;
   const svg =
     `<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 ${size} ${size}' shape-rendering='crispEdges'>` +
     `<path d='M0 0${path}'/></svg>`;
   return `url("data:image/svg+xml,${svg.replace(/</g, "%3C").replace(/>/g, "%3E")}")`;
 }
 
-const rank = thresholdMap();
-const lines = HALO_LEVELS.map((d, i) => `  --dots-${i + 1}: ${tile(rank, d, 4, 3)};`);
+const bayer = bayerMap(8);
+const dots = randomMap(16);
+const lines = [
+  ...FADE_LEVELS.map((d, i) => `  --fade-${i + 1}: ${tile(bayer, d, 1, 1)};`),
+  ...HALO_LEVELS.map((d, i) => `  --dots-${i + 1}: ${tile(dots, d, 4, 3)};`),
+];
 
 writeFileSync(
   "src/app/dither.css",

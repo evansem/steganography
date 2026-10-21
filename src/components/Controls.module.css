@@ -212,7 +212,7 @@
 
 .primary {
   composes: dissolve from "./Edges.module.css";
-  --p: 3px;
+  --p: 4px;
   --edge: var(--glow);
   --fill: var(--glow);
   color: var(--ink);
@@ -230,7 +230,7 @@
 
 .secondary {
   composes: dissolve from "./Edges.module.css";
-  --p: 3px;
+  --p: 4px;
   --fill: var(--ink-2);
 }
 

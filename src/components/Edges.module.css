@@ -2,8 +2,8 @@
    Edge treatments. Justeg never rounds a corner. Edges are made of pixels:
 
    .dissolve  surfaces and controls: the edge breaks up into an ordered
-              dither (25% -> 50% -> 75% -> solid), so a panel fades into
-              the page one pixel cell at a time, like a low-bit image.
+              dither in six even steps, so a panel fades into the page
+              one pixel cell at a time, like a low-bit image.
    .halo      wrappers around large surfaces: a field of square dots that
               thins out over eight bands from the surface, and twinkles
               slowly.
@@ -18,20 +18,22 @@
    ========================================================================== */
 
 /*
- * --p      size of one dither cell (default --dither)
- * --edge   colour of the two outer bands, the "glow" pixels
+ * --p      width of the fade is three times --p (default --dither); keep it
+ *          a multiple of 2px so the half-size dither cells land on pixels
+ * --edge   colour of the outer bands, the "glow" pixels
  * --fill   colour of the surface; --fill-image / --edge-image take images
  *
- * The mask is built bottom-up with mask-composite. With R(k) a rectangle
- * inset by k cells and P(n) an n% ordered-dither tile:
- *   R3, + P75, n R2, + P50, n R1, + P25
- * which leaves 25% coverage in the outer band, 50% in the next, 75% in the
- * third and solid inside. The patterns are nested (P25 in P50 in P75) and
- * share one origin, so the bands line up cell for cell.
+ * The edge fades over six bands, each one dither cell (--p / 2) wide. The
+ * mask is built bottom-up with mask-composite. With R(k) a rectangle inset
+ * by k cells and F(n) the n-th ordered-dither tile (n/7 coverage):
+ *   F1 + (F2 + (... + (F6 + R6) n R5 ...) n R2) n R1
+ * so each band shows one density and the core inside R6 is solid. The Bayer tiles are nested
+ * and share one origin, so the bands line up cell for cell.
  */
 .dissolve {
   --_p: var(--p, var(--dither));
-  --_t: calc(var(--_p) * 2);
+  --_c: calc(var(--_p) / 2);
+  --_t: calc(var(--_c) * 8);
   --_e: var(--edge, var(--line-strong));
   --_f: var(--fill, var(--ink));
 
@@ -41,28 +43,46 @@
       no-repeat,
     var(--edge-image, linear-gradient(var(--_e) 0 0));
   -webkit-mask-image:
-    conic-gradient(#000 0 25%, transparent 0), linear-gradient(#000 0 0),
-    repeating-conic-gradient(#000 0 25%, transparent 0 50%), linear-gradient(#000 0 0),
-    conic-gradient(#000 0 75%, transparent 0), linear-gradient(#000 0 0);
+    var(--fade-1), linear-gradient(#000 0 0), var(--fade-2), linear-gradient(#000 0 0), var(--fade-3),
+    linear-gradient(#000 0 0), var(--fade-4), linear-gradient(#000 0 0), var(--fade-5), linear-gradient(#000 0 0),
+    var(--fade-6), linear-gradient(#000 0 0);
   mask-image:
-    conic-gradient(#000 0 25%, transparent 0), linear-gradient(#000 0 0),
-    repeating-conic-gradient(#000 0 25%, transparent 0 50%), linear-gradient(#000 0 0),
-    conic-gradient(#000 0 75%, transparent 0), linear-gradient(#000 0 0);
+    var(--fade-1), linear-gradient(#000 0 0), var(--fade-2), linear-gradient(#000 0 0), var(--fade-3),
+    linear-gradient(#000 0 0), var(--fade-4), linear-gradient(#000 0 0), var(--fade-5), linear-gradient(#000 0 0),
+    var(--fade-6), linear-gradient(#000 0 0);
   -webkit-mask-size:
     var(--_t) var(--_t),
-    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    calc(100% - 2 * var(--_c)) calc(100% - 2 * var(--_c)),
     var(--_t) var(--_t),
-    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    calc(100% - 4 * var(--_c)) calc(100% - 4 * var(--_c)),
     var(--_t) var(--_t),
-    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p));
+    calc(100% - 6 * var(--_c)) calc(100% - 6 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 8 * var(--_c)) calc(100% - 8 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 10 * var(--_c)) calc(100% - 10 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 12 * var(--_c)) calc(100% - 12 * var(--_c));
   mask-size:
     var(--_t) var(--_t),
-    calc(100% - 2 * var(--_p)) calc(100% - 2 * var(--_p)),
+    calc(100% - 2 * var(--_c)) calc(100% - 2 * var(--_c)),
     var(--_t) var(--_t),
-    calc(100% - 4 * var(--_p)) calc(100% - 4 * var(--_p)),
+    calc(100% - 4 * var(--_c)) calc(100% - 4 * var(--_c)),
     var(--_t) var(--_t),
-    calc(100% - 6 * var(--_p)) calc(100% - 6 * var(--_p));
+    calc(100% - 6 * var(--_c)) calc(100% - 6 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 8 * var(--_c)) calc(100% - 8 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 10 * var(--_c)) calc(100% - 10 * var(--_c)),
+    var(--_t) var(--_t),
+    calc(100% - 12 * var(--_c)) calc(100% - 12 * var(--_c));
   -webkit-mask-position:
+    0 0,
+    center,
+    0 0,
+    center,
+    0 0,
+    center,
     0 0,
     center,
     0 0,
@@ -75,11 +95,21 @@
     0 0,
     center,
     0 0,
+    center,
+    0 0,
+    center,
+    0 0,
+    center,
+    0 0,
     center;
-  -webkit-mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
-  mask-repeat: repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
-  -webkit-mask-composite: source-over, source-in, source-over, source-in, source-over, source-over;
-  mask-composite: add, intersect, add, intersect, add, add;
+  -webkit-mask-repeat:
+    repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
+  mask-repeat:
+    repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat, repeat, no-repeat;
+  -webkit-mask-composite:
+    source-over, source-in, source-over, source-in, source-over, source-in, source-over, source-in, source-over,
+    source-in, source-over, source-over;
+  mask-composite: add, intersect, add, intersect, add, intersect, add, intersect, add, intersect, add, add;
 }
 
 /* the mask would hide an outside focus ring, so draw it on the solid core */
