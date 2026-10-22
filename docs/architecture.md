@@ -137,6 +137,17 @@ sequenceDiagram
 
 CI runs a Prettier format check, lint, type-check, all unit tests and a production build on every pull request (NFR-Q2).
 
+## Release and provenance
+
+Publishing a GitHub release runs `.github/workflows/release.yml` (NFR-S9):
+
+1. Test and build on a GitHub-hosted runner.
+2. Pack the production bundle (`.next` without its cache, `package.json`, `package-lock.json`, `next.config.ts`) reproducibly: sorted entries, fixed owners and the commit timestamp, so the digest depends on content alone.
+3. Sign a SLSA build provenance attestation for that digest with `actions/attest-build-provenance`. Signing uses the workflow's short-lived OIDC identity through Sigstore, so there is no long-lived key to manage.
+4. Attach the bundle and its SHA-256 checksum to the release.
+
+Each job gets only the permissions it needs. The build job can read the repository and write attestations; only the publish job can write release assets. Every action is pinned to a full commit SHA.
+
 ## Decisions
 
 See [`adr/`](adr/) for the reasoning behind the main choices.
