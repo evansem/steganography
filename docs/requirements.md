@@ -73,6 +73,7 @@ This document states what the app must do (functional requirements), how well it
 | NFR-S6 | Every response sends a restrictive Content-Security-Policy and standard hardening headers (nosniff, frame denial, Referrer-Policy, Permissions-Policy, COOP, HSTS). |
 | NFR-S7 | No third-party scripts, fonts or trackers are loaded. |
 | NFR-S8 | Runtime dependencies have no known high-severity vulnerabilities, checked in CI. |
+| NFR-S9 | Every release bundle is built in CI from a tagged commit and carries a signed SLSA build provenance attestation that anyone can verify against the repository. |
 
 ### Correctness and quality
 

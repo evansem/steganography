@@ -51,6 +51,13 @@ npm test
 
 For production, any Node.js 20.9+ host works: `npm ci`, `npm run build`, then `npm start`. The favicon reader needs a Node runtime, so a purely static host is not enough.
 
+Each GitHub release also ships a prebuilt bundle with a signed build provenance attestation. Verify it before deploying, then install runtime dependencies and start:
+
+```bash
+gh attestation verify justeg-<version>.tar.gz --repo evansem/steganography
+tar -xzf justeg-<version>.tar.gz && npm ci --omit=dev && npm start
+```
+
 ## Limits
 
 LSB steganography does not survive lossy recompression. Re-saving as JPEG, resizing or sending through most chat and social apps destroys the message, so share the PNG as a file. Statistical analysis can suggest that an image was edited even when it cannot read the message. Unencrypted mode is hidden, not secret.
